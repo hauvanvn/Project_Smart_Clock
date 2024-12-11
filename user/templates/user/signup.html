@@ -1,0 +1,38 @@
+{% extends "user/layout.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="rounded-5 p-3 bg-dark shadow box-area" style="width: 450px; height: 550px; --bs-bg-opacity: .8;">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-2">
+                <label for="username" class="form-label mb-2" id="form_label">Username</label>
+                <input type="text" name="user" id="username" class="form-control form-control-xl fs-6">
+            </div>
+
+            <div class="mb-2">
+                <label for="email" class="form-label mb-2" id="form_label">Email</label>
+                <input type="text" name="user_email" id="email" class="form-control form-control-xl fs-6">
+            </div>
+
+            <div class="mb-2">
+                <label for="password1" class="form-label mb-2" id="form_label">Password</label>
+                <input type="password" name="pass1" id="password1" class="form-control form-control-xl fs-6">
+            </div>
+
+            <div class="mb-4">
+                <label for="password2" class="form-label mb-2" id="form_label">Confirm Password</label>
+                <input type="password" name="pass2" id="password2" class="form-control form-control-xl fs-6">
+            </div>
+            
+            <button type="submit" class="w-100 btn btn-dark btn-md mb-4">Sign Up</button>
+        </form>
+
+        <div class="d-flex justify-content-center">
+            <a href="{% url 'user:login' %}" id="form_label" style="font-size: 15px; text-decoration: underline;">Sign In</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

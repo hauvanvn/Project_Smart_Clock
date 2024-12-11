@@ -1,0 +1,28 @@
+{% extends "user/layout.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="rounded-5 p-3 bg-dark shadow box-area" style="width: 450px; height: 350px; --bs-bg-opacity: .8;">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-2">
+                <label for="username" class="form-label mb-2" id="form_label">Username</label>
+                <input type="text" name="user" id="username" class="form-control form-control-xl fs-6">
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="form-label mb-2" id="form_label">Password</label>
+                <input type="password" name="pass" id="password" class="form-control form-control-xl fs-6">
+            </div>
+            
+            <button type="submit" class="w-100 btn btn-dark btn-md mb-4">Sign In</button>
+        </form>
+        <div class="d-flex">
+            <a href="{% url 'user:getCode' %}" id="form_label" style="font-size: 15px; text-decoration: underline;">Forgot password?</a>
+            <a href="{% url 'user:signUp' %}" id="form_label" class="ms-auto" style="font-size: 15px; text-decoration: underline;">Sign Up Here</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

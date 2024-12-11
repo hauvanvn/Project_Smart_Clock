@@ -1,0 +1,22 @@
+{% extends "user/layout.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="rounded-5 p-3 bg-dark shadow box-area" style="width: 450px; height: 250px; --bs-bg-opacity: .8;">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="username" class="form-label mb-2" id="form_label">Username</label>
+                <input type="text" name="user" id="username" class="form-control form-control-xl fs-6">
+            </div>
+            
+            <button type="submit" class="w-100 btn btn-dark btn-md mb-4">Get OTP</button>
+        </form>
+        <div class="d-flex justify-content-center">
+            <a href="{% url 'user:login' %}" id="form_label" style="font-size: 15px; text-decoration: underline;">Go back to Sign In</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,6 @@
+body {
+    background-image: linear-gradient(#FFFFFF, #51ABEB);
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; 
+}
