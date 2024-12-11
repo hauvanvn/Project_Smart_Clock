@@ -11,6 +11,6 @@ Những framework được sử dụng trong đồ án:
 3. Django framework cho backend
 4. mySQL cho database
 
-###Thành viên trong Nhóm:
+### Thành viên trong Nhóm:
 1. Nguyễn Văn Hậu(22127105), Design và Backend Dev
 2. Nguyễn Văn Đức(22127073), Design và Frontend Dev
