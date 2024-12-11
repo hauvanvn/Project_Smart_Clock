@@ -1,12 +1,13 @@
 from django.urls import path
 from .import views
 
-app_name = 'user'
+app_name = 'users'
 
 urlpatterns = [
     path('', views.loginPage, name="login"),
-    path('signUp/', views.signUpPage, name="signUp"),
-    path('getOTP/', views.getOTP, name="getCode"),
-    path('resetPassword/', views.resetPass, name="resetPass"),
-    path('account/', views.accountPage, name="account"),
+    path("signup/", views.signUpPage, name="signup"),
+    path('getcode/', views.getOTP, name="resetPass"),
+    path('resetPass/', views.resetPass, name="resetPass_1"),
+    path('logout/', views.logoutPage, name='logout'),
+    path('profile/', views.accountPage, name='profile'),
 ]

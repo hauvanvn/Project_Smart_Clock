@@ -20,21 +20,21 @@
             background-repeat: no-repeat;
             background-size: 100%;
 
-            min-height: 790px;
+            min-height: 690px;
         }
     </style>
 </head>
 <body>
     <div class="welcome_block">
         <div class="d-flex p-4 mb-5">
-            <a href="{% url "user:account" %}" class="ms-auto">
-                <img src="{% static 'img/Avatar.svg' %}" alt="Avatar">
+            <a href="{% url "users:profile" %}" class="ms-auto">
+                <img src="{{ user.avatar.url }}" alt="Avatar">
             </a>
         </div>
 
         <div class="text-center fw-bold pt-3" style="font-size: 90px; color: #EDE2FF">
             <p>Welcome back</p>
-            <p>Duc</p>
+            <p>{{ user.username }}</p>
         </div>
     </div>
 
@@ -52,38 +52,24 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th scope="row" id="table_element">1</th>
-                <td id="table_element">
-                    <div class="d-flex">
-                        <a href="{% url "device:dashboard" %}" style="color: #EDE2FF; text-decoration: none">Device Name</a>
-                        <a href="" class="ms-auto" style="color: #EDE2FF"><i class="bi bi-pencil"></i></a>
-                    </div>
-                </td>
-                <td id="table_element">Device Type</td>
-                <td id="table_element">
-                    <div class="d-flex">
-                        <p>Device Status</p>
-                        <a href="" class="ms-auto" style="color: #EDE2FF"><i class="bi bi-trash3"></i></a>
-                    </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row" id="table_element">2</th>
-                <td id="table_element">
-                    <div class="d-flex">
-                        <a href="" style="color: #EDE2FF; text-decoration: none">Device Name</a>
-                        <a href="" class="ms-auto" style="color: #EDE2FF"><i class="bi bi-pencil"></i></a>
-                    </div>
-                </td>
-                <td id="table_element">Device Type</td>
-                <td id="table_element">
-                    <div class="d-flex">
-                        <a href="" style="color: #EDE2FF; text-decoration: none">Device Name</a>
-                        <a href="" class="ms-auto" style="color: #EDE2FF"><i class="bi bi-trash3"></i></a>
-                    </div>
-                </td>
-              </tr>
+                {% for device in devides %}
+                    <tr>
+                        <th scope="row" id="table_element">{{ forloop.counter1 }}</th>
+                        <td id="table_element">
+                            <div class="d-flex">
+                                <a href="{% url "device:dashboard" %}" style="color: #EDE2FF; text-decoration: none">{{ device.name }}</a>
+                                <a href="" class="ms-auto" style="color: #EDE2FF"><i class="bi bi-pencil"></i></a>
+                            </div>
+                        </td>
+                        <td id="table_element">{{ device.type }}</td>
+                        <td id="table_element">
+                            <div class="d-flex">
+                                <p>Device Status</p>
+                                <a href="" class="ms-auto" style="color: #EDE2FF"><i class="bi bi-trash3"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
 
