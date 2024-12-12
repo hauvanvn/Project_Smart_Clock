@@ -1,0 +1,15 @@
+.header {
+    position: sticky;
+    top: 0;
+    background-color: transparent;
+}
+
+.clock_block {
+    background-color: white;
+    min-height: 600px;
+}
+
+.statistic_block {
+    background-color: #C0E1F8;
+    min-height: 400px;
+}

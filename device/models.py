@@ -5,7 +5,7 @@ from user.models import User
 
 class Devices(models.Model):
     class Type(models.TextChoices):
-        SM = "SMART CLOCK", "Smart Clock"
+        CL = "SMART CLOCK", "Smart Clock"
         NONE = "NONE", "None"
 
     id = models.CharField(max_length=10, primary_key=True)

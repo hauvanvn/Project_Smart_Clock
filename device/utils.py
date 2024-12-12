@@ -1,4 +1,4 @@
-from .models import THdata
+from .models import THdata, Devices
 from django.db.models import Avg
 import datetime
 
@@ -36,3 +36,9 @@ def get_THdata_average(type):
             avg_hum=Avg('humidity')
         )
         return yearly_avg
+
+def getType(serial):
+     if serial[:2] == "CL":
+          return Devices.Type.CL
+     else:
+          return Devices.Type.NONE
