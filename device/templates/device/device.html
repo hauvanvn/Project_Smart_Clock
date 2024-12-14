@@ -14,26 +14,338 @@
         Dashboard
     </title>
 
+    <style>
+        .dropdown {
+          position: relative;
+          display: inline-block;
+        }
+        
+        .dropdown-content {
+          display: none;
+          position: absolute;
+          background-color: #f1f1f1;
+          min-width: 160px;
+          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+          z-index: 1;
+        }
+        
+        .dropdown-content a {
+          color: black;
+          padding: 12px 16px;
+          text-decoration: none;
+          display: block;
+        }
+        
+        .dropdown-content a:hover {background-color: #ddd;}
+        
+        .dropdown:hover .dropdown-content {display: block;}
+    </style>
 </head>
 <body>
-    <div class="header">
+    <div class="Header">
         <div class="d-flex flex-row" style="font-weight: bold">
-            <p style="padding: 30px 30px 0px 30px">LED Mode</p>
-            <p style="padding: 30px 30px 0px 30px">Echo Mode</p>
-            
+            <div class="dropdown" style="padding: 30px 30px 0px 30px">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="font-size: 30px">
+                    LED Mode
+                </button>
+                <ul class="dropdown-menu p-3">
+                    <li>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="ledMode1" checked>
+                            <label class="form-check-label" for="ledMode1">
+                                Mode 1
+                            </label>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="ledMode2">
+                            <label class="form-check-label" for="ledMode2">
+                                Mode 2
+                            </label>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="ledMode3">
+                            <label class="form-check-label" for="ledMode3">
+                                Mode 3
+                            </label>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <p class="me-auto" style="padding: 30px 30px 0px 30px; font-size: 30px">Echo Mode</p>
+
+            <div class="dropdown" style="padding: 10px 30px 10px 0px">
+                <img src="{{ user.avatar.url }}" alt="Avatar">
+                <div class="dropdown-content">
+                    <a href="#">View Account</a>
+                    <a href="#">Logout</a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="clock_block text-center">
-        <div>
-            <p class="fw-bold fst-italic pt-5" style="font-size: 150px">17: 23: 12 </p>
-            <p>ABc</p>
+    <div class="clock_block">
+        <div class="d-flex flex-column justify-content-center align-items-center pt-5">
+            <p class="fw-bold fst-italic" style="font-size: 170px; padding-bottom: 30px">17: 23: 12 </p>
+            <p class="fw-medium" style="font-size: 20px;">Sunday, November 10, 2024</p>
+            <p class="fw-medium" style="font-size: 20px;">Time Zone: Viet Nam (UTC +7)</p>
+            <p class="fw-medium" style="font-size: 20px;">Alarm: 6.40</p>
+
+            <div class="d-flex flex-row justify-content-evenly mt-4">
+                <button class="btn btn-primary clock_button" type="submit" style="margin-right: 30px; font-size: 18px">Time Zone</button>
+                <button class="btn btn-primary clock_button" type="submit" style="margin-left: 30px; font-size: 18px">Alarm</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="statistic_block d-flex flex-column">
+        <div class="row mt-5" style="max-width: 100%">
+            <div class="col-6 d-flex justify-content-center">
+                <div class="card statistic_data border-0" style="background: linear-gradient(90deg, rgba(217, 217, 217, 0.7) 5.1%, rgba(216, 31, 31, 0.6) 58.1%)">
+                    <div class="card-body text-center fw-bold" style="font-size: 30px">
+                        <p>24°C</p>
+                        <p>Tempature</p>
+                    </div>
+                </div>
+            </div>
+                
+
+            <div class="col-6 d-flex justify-content-center">
+                <div class="card statistic_data border-0" style="background: linear-gradient(90deg, rgba(217, 217, 217, 0.7) 3.6%, rgba(31, 98, 216, 0.6) 58.1%)">
+                    <div class="card-body text-center fw-bold" style="font-size: 30px">
+                        <p>70%</p>
+                        <p>Humidity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center">
+            <form class="row row-cols-lg-auto g-3 align-items-center mt-3">
+                <div class="col-12">
+                    <select class="form-select" id="inlineFormSelectPref">
+                            <option selected>Choose...</option>
+                            <option value="1">Day</option>
+                            <option value="2">Month</option>
+                            <option value="3">Year</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="time_inp" placeholder="Specific">
+                    </div>
+                </div>
+              
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="events_block d-flex flex-column p-5">
+        <p class="text-center fw-bold" style="font-size: 90px">Today events</p>
+        <div class="d-flex justify-content-center">
+            <div class="card" style="min-width: 70%; border-radius: 50px">
+                <div class="card-body p-4" style="font-size: 45px">
+                    <ul>
+                        <li>13:00 Create UI design for website</li>
+                        <li>19:00 Write proposal</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="calendar_block">
+
+        <div class="d-flex justify-content-center">
+            <p class="text-center fw-medium" id="monthYear" style="font-size:30px; color: #585757; padding-top: 20px"></p>
+            <button id="prev" type="button" class="btn btn-outline-light fw-medium" style="background-color: transparent; color: #585757; font-size:30px">
+                <
+            </button>
+            <button id="next" type="button" class="btn btn-outline-light fw-medium" style="background-color: transparent; color: #585757; font-size:30px">
+                >
+            </button> 
         </div>
         
-    </div>
+        <div class="d-flex justify-content-center">
+            <div class="card" style="min-width: 10%; min-height: 40px;border-radius: 0;">
+                <div class="card-body padding_zero">
+                    <p class="margin_zero dayOfWeek">MON</p>
+                </div>
+            </div>
+            <div class="card" style="min-width: 10%; min-height: 40px;border-radius: 0;">
+                <div class="card-body padding_zero">
+                    <p class="margin_zero dayOfWeek">TUE</p>
+                </div>
+            </div>
+            <div class="card" style="min-width: 10%; min-height: 40px;border-radius: 0;">
+                <div class="card-body padding_zero">
+                    <p class="margin_zero dayOfWeek">WED</p>
+                </div>
+            </div>
+            <div class="card" style="min-width: 10%; min-height: 40px;border-radius: 0;">
+                <div class="card-body padding_zero">
+                    <p class="margin_zero dayOfWeek">THU</p>
+                </div>
+            </div>
+            <div class="card" style="min-width: 10%; min-height: 40px;border-radius: 0;">
+                <div class="card-body padding_zero">
+                    <p class="margin_zero dayOfWeek">FRI</p>
+                </div>
+            </div>
+            <div class="card" style="min-width: 10%; min-height: 40px;border-radius: 0;">
+                <div class="card-body padding_zero">
+                    <p class="margin_zero dayOfWeek">SAT</p>
+                </div>
+            </div>
+            <div class="card" style="min-width: 10%; min-height: 40px;border-radius: 0;">
+                <div class="card-body padding_zero">
+                    <p class="margin_zero dayOfWeek">SUN</p>
+                </div>
+            </div>
+        </div>
 
-    <div class="statistic_block">
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa quod, autem architecto dignissimos neque ducimus delectus</p>
+        <div id="dates"></div>
+
+        <div class="mt-3 d-flex justify-content-center">
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                Add event
+            </button>
+        </div>
+        <div class="collapse" id="collapseExample">
+            <div class="d-flex justify-content-center mt-2">
+                <div class="card card-body" style="max-width: 50%">
+                    <form>
+                        <div class="mb-3">
+                          <label for="date_inp" class="form-label">Date:</label>
+                          <input type="date" class="form-control" id="date_inp">
+                        </div>
+
+                        <div class="mb-3">
+                          <label for="event" class="form-label">Event:</label>
+                          <input type="text" class="form-control" id="event">
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                            <label class="form-check-label" for="flexRadioDefault1">
+                                Tag Blue
+                            </label>
+                        </div>
+                            <div class="mb-3 form-check">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+                            <label class="form-check-label" for="flexRadioDefault2">
+                                Tag Black
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+
     </div>
+    <script>
+        const monthYear = document.getElementById('monthYear');
+        const dates = document.getElementById('dates');
+        const prev = document.getElementById('prev');
+        const next = document.getElementById('next');
+
+        let currentDate = new Date();
+
+        const updateCalendar = () => {
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth();
+        
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const totalDays = lastDay.getDate();
+            const firstDayIndex = (firstDay.getDay() + 6) % 7;
+            console.log(firstDay);
+            console.log(firstDayIndex);
+
+            const monthYearStr = currentDate.toLocaleString('default', { month: 'long' }) + ', ' + currentYear;
+            monthYear.innerHTML = monthYearStr;
+        
+            let days = `<div class="d-flex justify-content-center">`; // Start a new row
+            let counter = 0;
+        
+            // Previous month's days
+            for (let x = firstDayIndex; x > 0; x--) {
+                const prevDate = new Date(currentYear, currentMonth, 1 - x);
+                days += `<div class="card date"> 
+                            <div class="card-body d-flex flex-column padding_zero">
+                                <p class="mb-auto margin_zero dayContent">${prevDate.getDate()}</p>
+                                <p class="dayContent" style="background-color: rgba(0, 133, 255, .1); border-radius: 4px; width: fit-content; color: #0085FF">Design</p>
+                                <p class="dayContent" style="background-color: #E8E8E8; border-radius: 4px; width: fit-content; color: #585757">Note Taking</p>
+                            </div>
+                         </div>`;
+                counter++;
+                if (counter % 7 === 0) {
+                    days += `</div><div class="d-flex justify-content-center">`; // Close and start a new row
+                }
+            }
+        
+            // Current month's days
+            for (let i = 1; i <= totalDays; i++) {
+                const curDate = new Date(currentYear, currentMonth, i);
+                const isToday = 
+                    i === new Date().getDate() &&
+                    currentMonth === new Date().getMonth() &&
+                    currentYear === new Date().getFullYear();
+        
+                days += `<div class="card date ${isToday ? 'highlight' : ''}">
+                            <div class="card-body d-flex flex-column padding_zero">
+                                <p class="mb-auto margin_zero dayContent">${i}</p>
+                                <p class="dayContent">Design</p>
+                                <p class="dayContent">Note Taking</p>
+                            </div>
+                         </div>`;
+                counter++;
+                if (counter % 7 === 0) {
+                    days += `</div><div class="d-flex justify-content-center">`; // Close and start a new row
+                }
+            }
+        
+            // Optional: Add next month's days to fill the last week
+            const remainingDays = 7 - (counter % 7);
+            if (remainingDays < 7) {
+                for (let j = 1; j <= remainingDays; j++) {
+                    const nextDate = new Date(currentYear, currentMonth + 1, j);
+                    days += `<div class="card date"> 
+                                <div class="card-body d-flex flex-column padding_zero">
+                                    <p class="mb-auto margin_zero dayContent">${nextDate.getDate()}</p>
+                                    <p class="dayContent">Design</p>
+                                    <p class="dayContent">Note Taking</p>
+                                </div>
+                             </div>`;
+                }
+            }
+        
+            days += `</div>`; // Close the last row
+            dates.innerHTML = days;
+        };
+        
+        prev.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateCalendar();
+        });
+
+        next.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateCalendar();
+        });
+
+        updateCalendar();
+    </script>
 </body>
 </html>
