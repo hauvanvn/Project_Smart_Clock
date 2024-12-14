@@ -54,7 +54,7 @@
             <tbody>
                 {% for device in devices %}
                     <tr>
-                        <th scope="row" id="table_element">{{ forloop.counter1 }}</th>
+                        <th scope="row" id="table_element">{{ forloop.counter }}</th>
                         <td id="table_element">
                             <div class="d-flex">
                                 <a href="{% url "device:dashboard" %}" style="color: #EDE2FF; text-decoration: none">{{ device.name }}</a>

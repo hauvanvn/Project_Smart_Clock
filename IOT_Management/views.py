@@ -1,9 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from device.models import Devices
 from device.forms import DevicesForm
 from device.utils import getType
+from device.mqtt import create_mqtt_client, stop_mqt_client, get_mqtt_client, on_message_newClient
+
+import paho.mqtt.client as mqtt
+import time
 
 @login_required(login_url="users:login")
 def homePage(request):
@@ -13,45 +18,49 @@ def homePage(request):
     print(devices)
 
     if request.method == "POST":
+        if 'delete_device' in request.POST:
+            # Delete device
+            device = Devices.objects.get(id=request.POST.get('delete_device'))
+            device.delete()
+            messages.success(request, "Delete device successfully!")
+            return redirect('home')
+        
+        if 'change_name' in request.POST:
+            # Change device name
+            device = Devices.objects.get(id=request.POST.get('change_name'))
+            device.name = request.POST.get('new_name')
+            device.save()
+            messages.success(request, "Change name device successfully!")
+            return redirect('home')
+
+        # Add device
         id = request.POST.get('device_id')
         name = request.POST.get('device_name')
         type = getType(id)
 
-        TOPIC_INP = id + "/inp"
-        TOPIC_OUT = id + "/out"
+        TOPIC_OUT = settings.MAIN_TOPIC + "/" + id + "/out"
+        
+        create_mqtt_client(id, TOPIC_OUT, on_message_newClient)
 
-        client = mqtt.Client()
-        client.on_connect = on_connect
-        client.on_message = on_message
-        client.connect(BROKER, PORT, keepalive=60)
-
-        client.loop_start()
-
-        connected = False
-        waitTime = 10
-        while waitTime:
-            if client.on_message:
-                connected = True
-                TOPIC_INP = ""
-                TOPIC_OUT = ""
-                client.loop_stop()
-                client.disconnect()
-                break
-            msg = '{"connect":"1", "LED":"2", "touched":"True"}'
-            client.publish(TOPIC_INP, msg)
-            waitTime -= 1
+        print("check 1")
+        for counter in range(11):
+            print("check counter", counter)
+            client = get_mqtt_client(id)
+            last_message = client._userdata.get("last_message")
+            if last_message:
+                print("check 2")
+                stop_mqt_client(id)
+                newDevice = DevicesForm({'id': id, 'name': name, 'type': type, 'owner': user})
+                if newDevice.is_valid():
+                    messages.success(request, "Device added successfully")
+                    newDevice.save()
+                    create_mqtt_client(id, TOPIC_OUT)
+                    return redirect('home')
+                
+            if counter == 10:
+                stop_mqt_client(id)
+                messages.warning(request, "Invalid device ID")
+                return redirect('home')
             time.sleep(1)
-
-        if connected:
-            newDevice = DevicesForm({'id': id, 'name': name, 'type': type, 'owner': user})
-
-            if newDevice.is_valid():
-                messages.success(request, "Device added successfully")
-                newDevice.save()
-                return render(request, 'home')
-            else:
-                messages.warning(request, "Missing device name")
-        else:
-            messages.warning(request, "Wrong ID")
 
     return render(request, 'home.html', {'user': user, 'devices': devices})

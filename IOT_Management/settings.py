@@ -13,9 +13,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 
-BROKER = "test.mosquitto.org"  # Replace with your broker address
-PORT = 1883  # Default MQTT port for Wokwi
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,6 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 secret_file = open("secret_file.txt", "r")
 secret_info = [line.strip() for line in secret_file]
+secret_file.close()
 
 SECRET_KEY = secret_info[0]
 
@@ -136,4 +134,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "user.User"
 
-secret_file.close()
+# MQTT
+BROKER = "test.mosquitto.org"  # Replace with your broker address
+PORT = 1883  # Default MQTT port for Wokwi
+MAIN_TOPIC = "nhom11_ly2_hcmusk22"
