@@ -1,0 +1,87 @@
+body {
+    overflow: -moz-scrollbars-none;
+    -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar { 
+    width: 0 !important;
+    display: none; 
+}
+
+.container {
+    margin: 0 auto; /* Centers the container */
+    padding: 0px; /* Adds space inside the container */
+}
+
+.Header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: rgb(108, 105, 105);
+}
+
+.clock_block {
+    background-color: white;
+    min-height: 700px;
+}
+
+.clock_button {
+    --bs-btn-border-color: none;
+    --bs-btn-hover-border-color: none;
+    --bs-btn-active-border-color: none;
+
+    --bs-btn-bg: #2C2C2C;
+    --bs-btn-hover-bg: rgb(74, 70, 70);
+    --bs-btn-active-bg: rgb(74, 70, 70);
+    
+
+    min-width: 100px;
+}
+
+.statistic_block {
+    background-color: #C0E1F8;
+    min-height: 900px;
+}
+
+.statistic_data {
+    min-width: 400px;
+    min-height: 170px;
+
+    border-radius: 26px;
+}
+
+.events_block {
+    background-color: #59AFEC;
+    min-height: 500px;
+}
+
+.calendar_block {
+    background-color: white;
+    min-height: 1500px;
+}
+
+.date {
+    min-width: 10%;
+    min-height: 170px;
+    border-radius: 0;
+}
+
+.dayOfWeek {
+    padding: 5px 0px 0px 10px;
+    color: #585757;
+    font-weight: 450;
+}
+
+.margin_zero {
+    margin: 0;
+}
+
+.padding_zero {
+    padding: 0;
+}
+
+.dayContent {
+    padding: 0px 10px 0px 10px;
+    color: #585757;
+    font-weight: 500;
+}

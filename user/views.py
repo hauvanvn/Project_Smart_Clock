@@ -64,15 +64,58 @@ def signUpPage(request):
     return render(request, 'user/signup.html')
 
 def getOTP(request):
+    if request.user.is_authenticated:
+        return redirect("home")
+    
     if request.method == "POST":
-        return redirect('user:resetPass')
+        username = request.POST.get('user')
+
+        user_exist = User.objects.filter(username=username).exists()
+        if (not user_exist):
+            messages.warning(request, 'Wrong Username.')
+            return redirect('users:resetPass')
+        else:
+            request.session['username'] = username
+            user = User.objects.get(username=username)
+            sendOtp(user)
+            return redirect('users:resetPass_1')
+
     return render(request, 'user/receiveOTP.html')
 
 def resetPass(request):
+    if request.user.is_authenticated:
+        return redirect("home")
+
+    if request.method == "POST":
+        username = request.session['username']
+        password1 = request.POST.get('pass1')
+        password2 = request.POST.get('pass2')
+        code = request.POST.get('opt')
+
+        user = User.objects.get(username=username)
+        otp = OtpToken.objects.filter(user=user).last()
+        
+        if otp.otp_expired_at > timezone.now():
+            if(password1 != password2):
+                messages.warning(request, 'Password do not match.')
+                return redirect('users:resetPass_1')
+            elif code != otp.otp_code:
+                messages.warning(request, 'Wrong otp.')
+                return redirect('users:resetPass_1')
+            else:
+                user.set_password(password2)
+                user.save()
+                messages.success(request, 'Successfully change password for: ' + username + '.')
+                return redirect('users:login')
+        else:
+            messages.warning(request, 'OTP has expired.')
+            return redirect('users:resetPass')
+        
     return render(request, 'user/resetPass.html')
 
 def logoutPage(request):
-    pass
+    logout(request)
+    return redirect('users:login')
 
 def accountPage(request):
     return render(request, 'user/account.html')

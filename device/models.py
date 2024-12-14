@@ -13,6 +13,13 @@ class Devices(models.Model):
     type = models.CharField(max_length=20, choices=Type, default=Type.NONE)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
+    def is_connected(self):
+        from .mqtt import check_connection
+        if check_connection(self.id):
+            return "Connected"
+        else:
+            return "Disconnected"
+
 class THdata(models.Model):
     id = models.BigAutoField(primary_key=True)
     device = models.ForeignKey(Devices, on_delete=models.CASCADE, null=True)

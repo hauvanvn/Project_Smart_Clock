@@ -4,18 +4,15 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from device.models import Devices
 from device.forms import DevicesForm
-from device.utils import getType
+from device.utils import getType, send_newDevice
 from device.mqtt import create_mqtt_client, stop_mqt_client, get_mqtt_client, on_message_newClient
 
-import paho.mqtt.client as mqtt
 import time
 
 @login_required(login_url="users:login")
 def homePage(request):
     user = request.user
     devices = Devices.objects.filter(owner__id=user.id)
-
-    print(devices)
 
     if request.method == "POST":
         if 'delete_device' in request.POST:
@@ -42,19 +39,16 @@ def homePage(request):
         
         create_mqtt_client(id, TOPIC_OUT, on_message_newClient)
 
-        print("check 1")
         for counter in range(11):
-            print("check counter", counter)
             client = get_mqtt_client(id)
             last_message = client._userdata.get("last_message")
             if last_message:
-                print("check 2")
                 stop_mqt_client(id)
                 newDevice = DevicesForm({'id': id, 'name': name, 'type': type, 'owner': user})
                 if newDevice.is_valid():
                     messages.success(request, "Device added successfully")
                     newDevice.save()
-                    create_mqtt_client(id, TOPIC_OUT)
+                    send_newDevice(id, TOPIC_OUT)
                     return redirect('home')
                 
             if counter == 10:

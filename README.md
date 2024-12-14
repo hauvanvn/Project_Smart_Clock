@@ -14,3 +14,20 @@ Những framework được sử dụng trong đồ án:
 ### Thành viên trong Nhóm:
 1. Nguyễn Văn Hậu(22127105), Design và Backend Dev
 2. Nguyễn Văn Đức(22127073), Design và Frontend Dev
+
+## Hướng dẫn chạy server
+1. `py -m venv .venv` với người lần đầu cài.
+2. `. .venv/Scripts/activate` để khởi tạo virtual environment.
+3. `git clone https://github.com/hauvanvn/Project_Smart_Clock.git` với người lần đầu tải.
+4. `cd Project_Smart_Clock`.
+5. `pip install -r requirements.txt` để cài các package cần thiết.
+6. Cài đặt Wsl(Windows Subsystem for Linux) để cài redis:
+    - `sudo apt update`
+    - `sudo apt install redis`
+    - `sudo service redis-server start`
+    - Để kiểm tra redis-server có hoạt động hay không: `redis-cli ping`. Nếu trả về PONG thì redis đã hoạt động.
+7. `daphne -p 8000 IOT_Management.asgi:application` để chạy server(both develop and product).
+
+Sau khi làm mà có dowload thêm pip mới thì xài lệnh này: `py -m pip freeze > requirements.txt`.
+
+Cảm ơn các bạn đã đọc.

@@ -1,0 +1,31 @@
+body {
+    overflow: -moz-scrollbars-none;
+    -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar { 
+    width: 0 !important;
+    display: none; 
+  }
+
+.device_block {
+    background-image: linear-gradient(#263C53, #54B0F2);
+    min-height: 400px;
+
+    padding: 0px 150px 0px 150px;
+}
+
+#table_element {
+    color: #EDE2FF;
+}
+
+.add_button {
+    --bs-btn-border-color: none;
+
+    --bs-btn-hover-color: #EDE2FF;
+    --bs-btn-hover-border-color: none;
+    --bs-btn-hover-bg: none;
+
+    --bs-btn-active-color: #EDE2FF;
+    --bs-btn-active-bg: #b1aeb5
+}

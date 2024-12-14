@@ -22,7 +22,12 @@ def auto_delete_material(sender, instance, **kwargs):
             os.remove(old_avatar.path)
 
 def sendOtp(user):
-    OtpToken.objects.create(user=user, otp_expired_at=timezone.now() + timezone.timedelta(minutes=5))
+    OtpToken.objects.update_or_create(
+        user=user,
+        defaults={
+            'otp_expired_at': timezone.now() + timezone.timedelta(minutes=5),
+        }
+    )
 
     otp = OtpToken.objects.filter(user=user).last()
     subject = "Email Verification"

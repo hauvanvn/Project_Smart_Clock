@@ -1,3 +1,6 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+import paho.mqtt.client as mqtt
 from .models import THdata, Devices
 from django.db.models import Avg
 from django.db.models.signals import post_delete
@@ -5,9 +8,33 @@ from django.dispatch import receiver
 from datetime import datetime, timedelta
 from device.mqtt import stop_mqt_client
 
+def send_newDevice(device_id, topic):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "mqtt_back_end",
+        {
+            "type": "send_event",
+            "message": {
+                "command": "add_device",
+                "device_id": device_id,
+                "topic": topic,
+            },
+        }
+    )
+
 @receiver(post_delete, sender=Devices)
 def delete_mqtt_client(sender, instance, **kwargs):
-    stop_mqt_client(instance.id)
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "mqtt_back_end",
+        {
+            "type": "send_event",
+            "message": {
+                "command": "delete_device",
+                "device_id": instance.id,
+            },
+        }
+    )
 
 def convert2Fahrenheit(celsius):
         return celsius * (9/5) + 32
