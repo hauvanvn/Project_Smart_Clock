@@ -82,7 +82,7 @@
                 <img src="{{ user.avatar.url }}" alt="Avatar">
                 <div class="dropdown-content">
                     <a href="#">View Account</a>
-                    <a href="#">Logout</a>
+                    <a href="{% url 'users:logout' %}">Logout</a>
                 </div>
             </div>
         </div>
@@ -127,7 +127,7 @@
         <div class="d-flex justify-content-center">
             <form class="row row-cols-lg-auto g-3 align-items-center mt-3">
                 <div class="col-12">
-                    <select class="form-select" id="inlineFormSelectPref">
+                    <select class="form-select" id="typeSelection" required>
                             <option selected>Choose...</option>
                             <option value="1">Day</option>
                             <option value="2">Month</option>
@@ -137,7 +137,7 @@
 
                 <div class="col-12">
                     <div class="input-group">
-                        <input type="number" class="form-control" id="time_inp" placeholder="Specific">
+                        <input type="number" class="form-control" id="time_inp" placeholder="Specific" required>
                     </div>
                 </div>
               
@@ -225,12 +225,12 @@
                     <form>
                         <div class="mb-3">
                           <label for="date_inp" class="form-label">Date:</label>
-                          <input type="date" class="form-control" id="date_inp">
+                          <input type="date" class="form-control" id="date_inp" required>
                         </div>
 
                         <div class="mb-3">
                           <label for="event" class="form-label">Event:</label>
-                          <input type="text" class="form-control" id="event">
+                          <input type="text" class="form-control" id="event" required>
                         </div>
 
                         <div class="form-check">

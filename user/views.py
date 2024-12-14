@@ -72,7 +72,8 @@ def resetPass(request):
     return render(request, 'user/resetPass.html')
 
 def logoutPage(request):
-    pass
+    logout(request)
+    return redirect('users:login')
 
 def accountPage(request):
     return render(request, 'user/account.html')
