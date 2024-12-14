@@ -1,6 +1,12 @@
 body {
-    background-image: linear-gradient(#FFFFFF, #51ABEB);
+    background: linear-gradient(45deg, pink, teal);
     background-repeat: no-repeat;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent; 
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.submitBtn {
+    --bs-btn-bg: #4F378A;
+    --bs-btn-hover-bg: #4F378A;
+    --bs-btn-active-bg: #4F378A;
 }

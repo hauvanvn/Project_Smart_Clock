@@ -9,17 +9,17 @@
             {% csrf_token %}
             <div class="mb-2">
                 <label for="otp_code" class="form-label mb-2" id="form_label">OTP</label>
-                <input type="text" name="otp" id="otp_code" class="form-control form-control-xl fs-6">
+                <input type="text" name="otp" id="otp_code" class="form-control form-control-xl fs-6" required>
             </div>
 
             <div class="mb-2">
                 <label for="password1" class="form-label mb-2" id="form_label">Password</label>
-                <input type="password" name="pass1" id="password1" class="form-control form-control-xl fs-6">
+                <input type="password" name="pass1" id="password1" class="form-control form-control-xl fs-6" required>
             </div>
 
             <div class="mb-4">
                 <label for="password2" class="form-label mb-2" id="form_label">Confirm Password</label>
-                <input type="password" name="pass2" id="password2" class="form-control form-control-xl fs-6">
+                <input type="password" name="pass2" id="password2" class="form-control form-control-xl fs-6" required>
             </div>
             
             <button type="submit" class="w-100 btn btn-dark btn-md mb-4">Reset Password</button>

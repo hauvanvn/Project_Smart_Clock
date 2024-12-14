@@ -57,16 +57,14 @@
                 <img src="{{ user.avatar.url }}" alt="Avatar">
                 <div class="dropdown-content">
                     <a href="{% url "users:profile" %}">View Account</a>
+<<<<<<< HEAD
                     <a href="{% url "users:logout" %}">Logout</a>
+=======
+                    <a href="{% url 'users:logout' %}">Logout</a>
+>>>>>>> a8255bc116b3cb0159a1329e6a8430a122846cfa
                 </div>
             </div>
         </div>
-        
-        {% comment %} <div class="d-flex p-4 mb-5">
-            <a href="{% url "users:profile" %}" class="ms-auto">
-                <img src="{{ user.avatar.url }}" alt="Avatar">
-            </a>
-        </div> {% endcomment %}
 
         <div class="text-center fw-bold pt-3" style="font-size: 90px; color: #EDE2FF">
             <p>Welcome back</p>
@@ -111,7 +109,11 @@
                                                     {% csrf_token %}
                                                     <div class="mb-4">
                                                         <label for="changeDeviceName" class="form-label mb-2" id="form_label">Device Name</label>
+<<<<<<< HEAD
                                                         <input type="text" name="new_name" id="changeDeviceName" class="form-control form-control-xl fs-6">
+=======
+                                                        <input type="text" name="change_device_name" id="changeDeviceName" class="form-control form-control-xl fs-6" required>
+>>>>>>> a8255bc116b3cb0159a1329e6a8430a122846cfa
                                                     </div>
                                                     
                                                     <button type="submit" name="change_name" value="{{ device.id }}" class="w-100 btn btn-dark btn-md mb-4">Change</button>
@@ -159,12 +161,12 @@
                             {% csrf_token %}
                             <div class="mb-2">
                                 <label for="deviceName" class="form-label mb-2" id="form_label">Device Name</label>
-                                <input type="text" name="device_name" id="deviceName" class="form-control form-control-xl fs-6">
+                                <input type="text" name="device_name" id="deviceName" class="form-control form-control-xl fs-6" required>
                             </div>
                 
                             <div class="mb-4">
                                 <label for="id" class="form-label mb-2" id="form_label">Device ID</label>
-                                <input type="password" name="device_id" id="id" class="form-control form-control-xl fs-6">
+                                <input type="password" name="device_id" id="id" class="form-control form-control-xl fs-6" required>
                             </div>
                             
                             <button type="submit" class="w-100 btn btn-dark btn-md mb-4">Add</button>
