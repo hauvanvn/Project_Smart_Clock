@@ -27,6 +27,7 @@ Những framework được sử dụng trong đồ án:
     - `sudo service redis-server start`
     - Để kiểm tra redis-server có hoạt động hay không: `redis-cli ping`. Nếu trả về PONG thì redis đã hoạt động.
 7. `daphne -p 8000 IOT_Management.asgi:application` để chạy server(both develop and product).
+8. Mở thêm một terminal và thực hiện bước 2, 4. Sau đó chạy lệnh `py manage.py run_mqtt` để chạy mqtt websocket để giao tiếp với thiết bị và server.
 
 Sau khi làm mà có dowload thêm pip mới thì xài lệnh này: `py -m pip freeze > requirements.txt`.
 
