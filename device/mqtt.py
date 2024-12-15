@@ -106,6 +106,7 @@ def get_mqtt_client(device_id):
         return mqtt_clients[device_id]
     return None
 
+heartbeat_stop_event = asyncio.Event() # Stop websocket
 async def websocket_client():
     uri = "ws://localhost:8000/ws/mqtt/back-end"
 
@@ -114,16 +115,18 @@ async def websocket_client():
             print("Connected to Back-end.")
             # Keep connection alive
             async def send_heartbeat():
-                while True:
+                while not heartbeat_stop_event.is_set():
                     try:
                         await webSocket.send(json.dumps({"command": "ping"}))
                         print("Ping sent to server")
-                        await asyncio.sleep(10)
+                        await asyncio.sleep(30)
                     except websockets.ConnectionClosed:
                         print("Connection closed while sending heartbeat.")
                         break
 
-            asyncio.create_task(send_heartbeat())
+                await webSocket.close()
+
+            heartbet_task = asyncio.create_task(send_heartbeat())
             # Send message
 
             # Reivce Message
@@ -141,6 +144,10 @@ async def websocket_client():
                 except websockets.ConnectionClosed:
                     print("Connection closed by server.")
                     break
+            
+            heartbeat_stop_event.set()
+            await heartbet_task
+
     except Exception as e:
         print(f"Error: {e}")
 
@@ -160,8 +167,8 @@ def initialize_mqtt_clients():
     try:
         while True:
             for device_id in mqtt_clients:
-                # status = "Connected" if check_connection(device_id) else "Disconnected"
-                print(f"Check connection of {device_id}: {status}")
+                status = "Connected" if check_connection(device_id) else "Disconnected"
+                # print(f"Check connection of {device_id}: {status}")
                 handle_device_status_message(device_id, status)
             time.sleep(5)
             # print("Next_loop")
@@ -172,3 +179,5 @@ def initialize_mqtt_clients():
             counter += 1
         
         print(f"Stopped MQTT clients for {counter} devices.")
+        
+        heartbeat_stop_event.set()
