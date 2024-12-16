@@ -43,9 +43,9 @@
 </head>
 <body>
     <div class="Header">
-        <div class="d-flex flex-row" style="font-weight: bold">
-            <div class="dropdown" style="padding: 30px 30px 0px 30px">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="font-size: 30px">
+        <div class="d-flex flex-row">
+            <div class="dropdown me-auto" style="padding: 30px 30px 0px 30px">
+                <button class="btn btn-secondary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" style="font-size: 30px">
                     LED Mode
                 </button>
                 <ul class="dropdown-menu p-3">
@@ -75,14 +75,13 @@
                     </li>
                 </ul>
             </div>
-
-            <p class="me-auto" style="padding: 30px 30px 0px 30px; font-size: 30px">Echo Mode</p>
-
+           
             <div class="dropdown" style="padding: 10px 30px 10px 0px">
                 <img src="{{ user.avatar.url }}" alt="Avatar">
                 <div class="dropdown-content">
-                    <a href="#">View Account</a>
+                    <a href="{% url "users:profile" %}">View Account</a>
                     <a href="{% url 'users:logout' %}">Logout</a>
+                    <a href="{% url 'home' %}">Home</a>
                 </div>
             </div>
         </div>
@@ -96,8 +95,101 @@
             <p class="fw-medium" style="font-size: 20px;">Alarm: 6.40</p>
 
             <div class="d-flex flex-row justify-content-evenly mt-4">
-                <button class="btn btn-primary clock_button" type="submit" style="margin-right: 30px; font-size: 18px">Time Zone</button>
-                <button class="btn btn-primary clock_button" type="submit" style="margin-left: 30px; font-size: 18px">Alarm</button>
+                <button class="btn btn-primary clock_button" type="button" data-bs-toggle="modal" data-bs-target="#setTimeZone" style="margin-right: 30px; font-size: 18px">Time Zone</button>
+                <button class="btn btn-primary clock_button" type="button" data-bs-toggle="modal" data-bs-target="#setAlarm" style="margin-left: 30px; font-size: 18px">Alarm</button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="setTimeZone" tabindex="-1" aria-labelledby="deviceLabel" aria-hidden="true" style="color: black">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="deviceLabel">Choose Timezone</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label for="timezone-offset" class="form-label mb-2" id="form_label">List of timezone:</label>
+                                <select name="timezone_offset" id="timezone-offset" class="span5">
+                                    <option value="-12:00">(GMT -12:00) Eniwetok, Kwajalein</option>
+                                    <option value="-11:00">(GMT -11:00) Midway Island, Samoa</option>
+                                    <option value="-10:00">(GMT -10:00) Hawaii</option>
+                                    <option value="-09:50">(GMT -9:30) Taiohae</option>
+                                    <option value="-09:00">(GMT -9:00) Alaska</option>
+                                    <option value="-08:00">(GMT -8:00) Pacific Time (US &amp; Canada)</option>
+                                    <option value="-07:00">(GMT -7:00) Mountain Time (US &amp; Canada)</option>
+                                    <option value="-06:00">(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
+                                    <option value="-05:00">(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
+                                    <option value="-04:50">(GMT -4:30) Caracas</option>
+                                    <option value="-04:00">(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
+                                    <option value="-03:50">(GMT -3:30) Newfoundland</option>
+                                    <option value="-03:00">(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
+                                    <option value="-02:00">(GMT -2:00) Mid-Atlantic</option>
+                                    <option value="-01:00">(GMT -1:00) Azores, Cape Verde Islands</option>
+                                    <option value="+00:00" selected="selected">(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
+                                    <option value="+01:00">(GMT +1:00) Brussels, Copenhagen, Madrid, Paris</option>
+                                    <option value="+02:00">(GMT +2:00) Kaliningrad, South Africa</option>
+                                    <option value="+03:00">(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
+                                    <option value="+03:50">(GMT +3:30) Tehran</option>
+                                    <option value="+04:00">(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
+                                    <option value="+04:50">(GMT +4:30) Kabul</option>
+                                    <option value="+05:00">(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
+                                    <option value="+05:50">(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
+                                    <option value="+05:75">(GMT +5:45) Kathmandu, Pokhara</option>
+                                    <option value="+06:00">(GMT +6:00) Almaty, Dhaka, Colombo</option>
+                                    <option value="+06:50">(GMT +6:30) Yangon, Mandalay</option>
+                                    <option value="+07:00">(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
+                                    <option value="+08:00">(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
+                                    <option value="+08:75">(GMT +8:45) Eucla</option>
+                                    <option value="+09:00">(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk</option>
+                                    <option value="+09:50">(GMT +9:30) Adelaide, Darwin</option>
+                                    <option value="+10:00">(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
+                                    <option value="+10:50">(GMT +10:30) Lord Howe Island</option>
+                                    <option value="+11:00">(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
+                                    <option value="+11:50">(GMT +11:30) Norfolk Island</option>
+                                    <option value="+12:00">(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
+                                    <option value="+12:75">(GMT +12:45) Chatham Islands</option>
+                                    <option value="+13:00">(GMT +13:00) Apia, Nukualofa</option>
+                                    <option value="+14:00">(GMT +14:00) Line Islands, Tokelau</option>
+                                </select>
+                                {% comment %} <input type="text" name="new_name" id="changeDeviceName" class="form-control form-control-xl fs-6" required> {% endcomment %}
+                            </div>
+                            
+                            <button type="submit" class="w-100 btn btn-dark btn-md mb-4">Set</button>
+                        </form>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="setAlarm" tabindex="-1" aria-labelledby="deviceLabel" aria-hidden="true" style="color: black">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="deviceLabel">Set alarm</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="alarmDate" class="form-label mb-2" id="form_label">Date</label>
+                                <input type="date" name="alarm_date" id="alarmDate" class="form-control form-control-xl fs-6" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="alarmTime" class="form-label mb-2" id="form_label">Time</label>
+                                <input type="time" name="alarm_time" id="alarmTime" class="form-control form-control-xl fs-6" required>
+                            </div>
+
+                            <button type="submit" class="w-100 btn btn-dark btn-md mb-4">Set</button>
+                        </form>
+                    </div>
+                
+                </div>
             </div>
         </div>
     </div>
@@ -127,8 +219,7 @@
         <div class="d-flex justify-content-center">
             <form class="row row-cols-lg-auto g-3 align-items-center mt-3">
                 <div class="col-12">
-                    <select class="form-select" id="typeSelection" required>
-                            <option selected>Choose...</option>
+                    <select class="form-select" id="typeSelection">
                             <option value="1">Day</option>
                             <option value="2">Month</option>
                             <option value="3">Year</option>
@@ -137,7 +228,7 @@
 
                 <div class="col-12">
                     <div class="input-group">
-                        <input type="number" class="form-control" id="time_inp" placeholder="Specific" required>
+                        <input type="date" class="form-control" id="time_inp" required>
                     </div>
                 </div>
               
@@ -233,15 +324,44 @@
                           <input type="text" class="form-control" id="event" required>
                         </div>
 
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                            <label class="form-check-label" for="flexRadioDefault1">
+                        <div class="mb-3">
+                            <label for="eventTime" class="form-label">Event:</label>
+                            <input type="time" name="event_time" class="form-control" id="eventTime" required>
+                        </div>
+
+                        <p>Tag Color:</p>
+
+                        <div class="mb-1 ps-5 form-check">
+                            <input class="form-check-input" type="radio" name="note_color" id="noteBlue">
+                            <label class="form-check-label" for="noteBlue">
                                 Tag Blue
                             </label>
                         </div>
-                            <div class="mb-3 form-check">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
-                            <label class="form-check-label" for="flexRadioDefault2">
+
+                        <div class="mb-1 ps-5 form-check">
+                            <input class="form-check-input" type="radio" name="note_color" id="noteGreen">
+                            <label class="form-check-label" for="noteGreen">
+                                Tag Green
+                            </label>
+                        </div>
+
+                        <div class="mb-1 ps-5 form-check">
+                            <input class="form-check-input" type="radio" name="note_color" id="noteRed">
+                            <label class="form-check-label" for="noteRed">
+                                Tag Red
+                            </label>
+                        </div>
+
+                        <div class="mb-1 ps-5 form-check">
+                            <input class="form-check-input" type="radio" name="note_color" id="noteOrange">
+                            <label class="form-check-label" for="noteOrange">
+                                Tag Orange
+                            </label>
+                        </div>
+
+                        <div class="mb-4 ps-5 form-check">
+                            <input class="form-check-input" type="radio" name="note_color" id="noteBlack" checked>
+                            <label class="form-check-label" for="noteBlack">
                                 Tag Black
                             </label>
                         </div>
@@ -270,8 +390,6 @@
             const lastDay = new Date(currentYear, currentMonth + 1, 0);
             const totalDays = lastDay.getDate();
             const firstDayIndex = (firstDay.getDay() + 6) % 7;
-            console.log(firstDay);
-            console.log(firstDayIndex);
 
             const monthYearStr = currentDate.toLocaleString('default', { month: 'long' }) + ', ' + currentYear;
             monthYear.innerHTML = monthYearStr;
@@ -285,8 +403,48 @@
                 days += `<div class="card date"> 
                             <div class="card-body d-flex flex-column padding_zero">
                                 <p class="mb-auto margin_zero dayContent">${prevDate.getDate()}</p>
-                                <p class="dayContent" style="background-color: rgba(0, 133, 255, .1); border-radius: 4px; width: fit-content; color: #0085FF">Design</p>
-                                <p class="dayContent" style="background-color: #E8E8E8; border-radius: 4px; width: fit-content; color: #585757">Note Taking</p>
+
+                                <div class="d-flex">
+                                    <a tabindex="0"
+                                        class="btn m-1 p-1 truncate" 
+                                        role="button" 
+                                        data-bs-toggle="popover" 
+                                        data-bs-placement="top" 
+                                        data-bs-trigger="focus" 
+                                        data-bs-title="Note Deadline"
+                                        data-bs-content="Note Content"
+                                        style="background-color: rgba(0, 133, 255, .1); 
+                                                border-radius: 4px; width: fit-content; 
+                                                color: #0085FF; 
+                                                font-weight: 500;">
+                                        Design
+                                    </a>
+                                    <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
+                                        {% csrf_token %}
+                                        <button type="button" class="btn-close"></button>
+                                    </form>
+                                </div>
+                                
+                                <div class="d-flex">
+                                    <a tabindex="0"
+                                        class="btn m-1 p-1 truncate" 
+                                        role="button" 
+                                        data-bs-toggle="popover" 
+                                        data-bs-placement="top" 
+                                        data-bs-trigger="focus" 
+                                        data-bs-title="Note Deadline"
+                                        data-bs-content="Note Content"
+                                        style="background-color: #E8E8E8; 
+                                               border-radius: 4px; width: fit-content; 
+                                               color: #585757; 
+                                               font-weight: 500;">
+                                        Note Taking 11112
+                                    </a>
+                                    <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
+                                        {% csrf_token %}
+                                        <button type="button" class="btn-close"></button>
+                                    </form>
+                                </div>
                             </div>
                          </div>`;
                 counter++;
@@ -306,8 +464,27 @@
                 days += `<div class="card date ${isToday ? 'highlight' : ''}">
                             <div class="card-body d-flex flex-column padding_zero">
                                 <p class="mb-auto margin_zero dayContent">${i}</p>
-                                <p class="dayContent">Design</p>
-                                <p class="dayContent">Note Taking</p>
+                                
+                                <div class="d-flex">
+                                    <a tabindex="0"
+                                        class="btn m-1 p-1 truncate" 
+                                        role="button" 
+                                        data-bs-toggle="popover" 
+                                        data-bs-placement="top" 
+                                        data-bs-trigger="focus" 
+                                        data-bs-title="Note Deadline"
+                                        data-bs-content="Note Content"
+                                        style="background-color: rgba(0, 133, 255, .1); 
+                                                border-radius: 4px; width: fit-content; 
+                                                color: #0085FF; 
+                                                font-weight: 500;">
+                                        Design
+                                    </a>
+                                    <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
+                                        {% csrf_token %}
+                                        <button type="button" class="btn-close"></button>
+                                    </form>
+                                </div>
                             </div>
                          </div>`;
                 counter++;
@@ -346,6 +523,8 @@
         });
 
         updateCalendar();
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
     </script>
 </body>
 </html>

@@ -85,3 +85,12 @@ body::-webkit-scrollbar {
     color: #585757;
     font-weight: 500;
 }
+
+.truncate {
+    width: fit-content;          /* Keep the natural width */
+    max-width: 120px;            /* Limit the width to prevent overflow */
+    white-space: nowrap;         /* Prevent line wrapping */
+    overflow: hidden;            /* Hide overflowing content */
+    text-overflow: ellipsis;     /* Show '...' for clipped text */
+    display: inline-block;       /* Allows proper width calculation */
+  }
