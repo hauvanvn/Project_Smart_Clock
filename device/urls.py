@@ -4,5 +4,5 @@ from .import views
 app_name = 'device'
 
 urlpatterns = [
-    path('', views.deviceDashboard, name="dashboard"),
+    path('<slug:slug>/', views.deviceDashboard, name="dashboard"),
 ]

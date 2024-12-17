@@ -87,7 +87,7 @@
                         <th scope="row" id="table_element">{{ forloop.counter }}</th>
                         <td id="table_element">
                             <div class="d-flex">
-                                <a href="{% url "device:dashboard" %}" style="color: #EDE2FF; text-decoration: none; padding-top: 2%">{{ device.name }}</a>
+                                <a href="{% url "device:dashboard" slug=device.id %}" style="color: #EDE2FF; text-decoration: none; padding-top: 2%">{{ device.name }}</a>
                                 
                                 <button class="btn btn-outline-secondary ms-auto" type="button" data-bs-toggle="modal" data-bs-target="#changName" style="--bs-btn-border-color: none">
                                     <i class="bi bi-pencil" style="color: #EDE2FF"></i>

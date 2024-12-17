@@ -36,6 +36,20 @@ def delete_mqtt_client(sender, instance, **kwargs):
         }
     )
 
+def send_deviceData(timezone, ledmode):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "mqtt_front_end",
+        {
+            "type": "send_event",
+            "message": {
+                "command": "device_data",
+                "timezone": timezone,
+                "ledmode": ledmode,
+            },
+        }
+    )
+
 def convert2Fahrenheit(celsius):
         return celsius * (9/5) + 32
 
