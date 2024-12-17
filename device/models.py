@@ -28,7 +28,7 @@ class Devices(models.Model):
         else:
             return "Disconnected"
         
-class DeivceArlam(models.Model):
+class DeviceArlam(models.Model):
     id = models.BigAutoField(primary_key=True)
     device = models.ForeignKey(Devices, on_delete=models.CASCADE)
     time = models.DateTimeField()

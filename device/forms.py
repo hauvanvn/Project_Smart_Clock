@@ -1,5 +1,5 @@
 from django import forms
-from .models import Devices, DeivceArlam, DeviceEvent
+from .models import Devices, DeviceArlam, DeviceEvent
 
 class DevicesForm(forms.ModelForm):
     class Meta:
@@ -8,7 +8,7 @@ class DevicesForm(forms.ModelForm):
 
 class ArlarmForm(forms.ModelForm):
     class Meta:
-        model = DeivceArlam
+        model = DeviceArlam
         fields = ('id', 'device', 'time')
 
 class EventForm(forms.ModelForm):

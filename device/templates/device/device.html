@@ -44,14 +44,14 @@
 <body>
     <div class="Header">
         <div class="d-flex flex-row">
-            <div class="dropdown me-auto" style="padding: 30px 30px 0px 30px">
+            <div class="dropdown" style="padding: 30px 30px 0px 30px">
                 <button class="btn btn-secondary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" style="font-size: 30px">
                     LED Mode
                 </button>
                 <ul class="dropdown-menu p-3">
                     <li>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="ledMode1" checked>
+                            <input class="form-check-input" type="radio" name="led_mode" id="ledMode1" checked>
                             <label class="form-check-label" for="ledMode1">
                                 Mode 1
                             </label>
@@ -59,7 +59,7 @@
                     </li>
                     <li>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="ledMode2">
+                            <input class="form-check-input" type="radio" name="led_mode" id="ledMode2">
                             <label class="form-check-label" for="ledMode2">
                                 Mode 2
                             </label>
@@ -67,8 +67,40 @@
                     </li>
                     <li>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="ledMode3">
+                            <input class="form-check-input" type="radio" name="led_mode" id="ledMode3">
                             <label class="form-check-label" for="ledMode3">
+                                Mode 3
+                            </label>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="dropdown me-auto" style="padding: 30px 30px 0px 30px">
+                <button class="btn btn-secondary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" style="font-size: 30px">
+                    Buzzer Mode
+                </button>
+                <ul class="dropdown-menu p-3">
+                    <li>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="buzzer_mode" id="buzzerMode1" checked>
+                            <label class="form-check-label" for="buzzerMode1">
+                                Mode 1
+                            </label>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="buzzer_mode" id="buzzerMode2">
+                            <label class="form-check-label" for="buzzerMode2">
+                                Mode 2
+                            </label>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="buzzer_mode" id="buzzerMode3">
+                            <label class="form-check-label" for="buzzerMode3">
                                 Mode 3
                             </label>
                         </div>
@@ -154,7 +186,6 @@
                                     <option value="Pacific/Apia">(UTC +13:00) Apia, Nukualofa</option>
                                     <option value="Pacific/Fakaofo">(UTC +14:00) Line Islands, Tokelau</option>
                                 </select>
-                                {% comment %} <input type="text" name="new_name" id="changeDeviceName" class="form-control form-control-xl fs-6" required> {% endcomment %}
                             </div>
                             
                             <button type="submit" name="change-timezone" class="w-100 btn btn-dark btn-md mb-4">Set</button>
@@ -175,20 +206,14 @@
                     <div class="modal-body">
                         <form method="POST">
                             {% csrf_token %}
-                            <div class="mb-3">
-                                <label for="alarmDate" class="form-label mb-2" id="form_label">Date</label>
-                                <input type="datetime-local" name="alarm_date" id="alarmDate" class="form-control form-control-xl fs-6" required>
-                            </div>
-                            
                             <div class="mb-4">
-                                <label for="alarmTime" class="form-label mb-2" id="form_label">Time</label>
-                                <input type="time" name="alarm_time" id="alarmTime" class="form-control form-control-xl fs-6" required>
+                                <label for="alarmDate" class="form-label mb-2" id="form_label">Date Time:</label>
+                                <input type="datetime-local" name="alarm_dateTime" id="alarmDate" class="form-control form-control-xl fs-6" required>
                             </div>
 
                             <button type="submit" name="set_arlam" class="w-100 btn btn-dark btn-md mb-4">Set</button>
                         </form>
                     </div>
-                
                 </div>
             </div>
         </div>
@@ -254,7 +279,6 @@
     </div>
 
     <div class="calendar_block">
-
         <div class="d-flex justify-content-center">
             <p class="text-center fw-medium" id="monthYear" style="font-size:30px; color: #585757; padding-top: 20px"></p>
             <button id="prev" type="button" class="btn btn-outline-light fw-medium" style="background-color: transparent; color: #585757; font-size:30px">
@@ -313,60 +337,56 @@
         <div class="collapse" id="collapseExample">
             <div class="d-flex justify-content-center mt-2">
                 <div class="card card-body" style="max-width: 50%">
-                    <form>
+                    <form method="POST">
+                        {% csrf_token %}
                         <div class="mb-3">
-                          <label for="date_inp" class="form-label">Date:</label>
-                          <input type="date" class="form-control" id="date_inp" required>
+                            <label for="date_inp" class="form-label">Date Time:</label>
+                            <input type="datetime-local" name="event_dateTime" class="form-control" id="date_inp" required>
                         </div>
 
                         <div class="mb-3">
-                          <label for="event" class="form-label">Event:</label>
-                          <input type="text" class="form-control" id="event" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="eventTime" class="form-label">Event:</label>
-                            <input type="time" name="event_time" class="form-control" id="eventTime" required>
+                            <label for="event" class="form-label">Event:</label>
+                            <input type="text" name="event_content" class="form-control" id="event" required>
                         </div>
 
                         <p>Tag Color:</p>
 
                         <div class="mb-1 ps-5 form-check">
-                            <input class="form-check-input" type="radio" name="note_color" id="noteBlue">
+                            <input class="form-check-input" type="radio" name="note_color" id="noteBlue" checked value="blue">
                             <label class="form-check-label" for="noteBlue">
                                 Tag Blue
                             </label>
                         </div>
 
                         <div class="mb-1 ps-5 form-check">
-                            <input class="form-check-input" type="radio" name="note_color" id="noteGreen">
+                            <input class="form-check-input" type="radio" name="note_color" id="noteGreen" value="green">
                             <label class="form-check-label" for="noteGreen">
                                 Tag Green
                             </label>
                         </div>
 
                         <div class="mb-1 ps-5 form-check">
-                            <input class="form-check-input" type="radio" name="note_color" id="noteRed">
+                            <input class="form-check-input" type="radio" name="note_color" id="noteRed" value="red">
                             <label class="form-check-label" for="noteRed">
                                 Tag Red
                             </label>
                         </div>
 
                         <div class="mb-1 ps-5 form-check">
-                            <input class="form-check-input" type="radio" name="note_color" id="noteOrange">
+                            <input class="form-check-input" type="radio" name="note_color" id="noteOrange" value="orange">
                             <label class="form-check-label" for="noteOrange">
                                 Tag Orange
                             </label>
                         </div>
 
                         <div class="mb-4 ps-5 form-check">
-                            <input class="form-check-input" type="radio" name="note_color" id="noteBlack" checked>
+                            <input class="form-check-input" type="radio" name="note_color" id="noteBlack" value="black">
                             <label class="form-check-label" for="noteBlack">
                                 Tag Black
                             </label>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" name="add_event" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
             </div>
@@ -374,6 +394,7 @@
         
 
     </div>
+    
     <script>
         // Kết nối WebSocket
         const socket = new WebSocket('ws://127.0.0.1:8000/ws/mqtt/front-end');
@@ -417,7 +438,7 @@
 
                 // Hiển thị thời gian mới
                 clockElement.textContent = `${hours}: ${minutes}: ${seconds}`;
-            }, 1000);
+            }, 970);
         }
 
         const monthYear = document.getElementById('monthYear');
@@ -425,8 +446,11 @@
         const prev = document.getElementById('prev');
         const next = document.getElementById('next');
 
-        let currentDate = new Date();
+        const eventList = {{events|safe}};
+        console.log(eventList);
 
+        let currentDate = new Date();
+        let content = '';
         const updateCalendar = () => {
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth();
@@ -439,59 +463,102 @@
             const monthYearStr = currentDate.toLocaleString('default', { month: 'long' }) + ', ' + currentYear;
             monthYear.innerHTML = monthYearStr;
         
+            const Deadline_list = {};
+            for (let i = 0; i < eventList.length; i++){
+                var year = eventList[i + 2];
+                var month = eventList[i + 3];
+                var day = eventList[i + 4];
+                Deadline = new Date(year, month - 1, day);
+
+                if (!(Deadline in Deadline_list)){
+                    var array = [];
+                    Deadline_list[Deadline] = array;
+                }
+                Deadline_list[Deadline].push(eventList[i]);
+                Deadline_list[Deadline].push(eventList[i + 5]);
+                Deadline_list[Deadline].push(eventList[i + 1]);
+                i += 5;
+            }
+            const Deadline_date_list = Object.keys(Deadline_list);
+            console.log(Deadline_list);
+
             let days = `<div class="d-flex justify-content-center">`; // Start a new row
             let counter = 0;
         
             // Previous month's days
             for (let x = firstDayIndex; x > 0; x--) {
                 const prevDate = new Date(currentYear, currentMonth, 1 - x);
+
+                let assign_list = []
+                for (let i = 0; i < Deadline_date_list.length; ++i){
+                    var timeStamp = Date.parse(Deadline_date_list[i]);
+
+                    if (prevDate.getTime() == timeStamp){
+                        for (let j = 0; j < Deadline_list[Deadline_date_list[i]].length; ++j){
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j]);
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j + 1]);
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j + 2]);
+                            j += 2;
+                        }
+                    }
+                }
+
                 days += `<div class="card date"> 
                             <div class="card-body d-flex flex-column padding_zero">
-                                <p class="mb-auto margin_zero dayContent">${prevDate.getDate()}</p>
+                                <p class="mb-auto margin_zero dayContent">${prevDate.getDate()}</p>`;
 
-                                <div class="d-flex">
-                                    <a tabindex="0"
-                                        class="btn m-1 p-1 truncate" 
-                                        role="button" 
-                                        data-bs-toggle="popover" 
-                                        data-bs-placement="top" 
-                                        data-bs-trigger="focus" 
-                                        data-bs-title="Note Deadline"
-                                        data-bs-content="Note Content"
-                                        style="background-color: rgba(0, 133, 255, .1); 
-                                                border-radius: 4px; width: fit-content; 
-                                                color: #0085FF; 
-                                                font-weight: 500;">
-                                        Design
-                                    </a>
-                                    <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
-                                        {% csrf_token %}
-                                        <button type="button" class="btn-close"></button>
-                                    </form>
-                                </div>
-                                
-                                <div class="d-flex">
-                                    <a tabindex="0"
-                                        class="btn m-1 p-1 truncate" 
-                                        role="button" 
-                                        data-bs-toggle="popover" 
-                                        data-bs-placement="top" 
-                                        data-bs-trigger="focus" 
-                                        data-bs-title="Note Deadline"
-                                        data-bs-content="Note Content"
-                                        style="background-color: #E8E8E8; 
-                                               border-radius: 4px; width: fit-content; 
-                                               color: #585757; 
-                                               font-weight: 500;">
-                                        Note Taking 11112
-                                    </a>
-                                    <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
-                                        {% csrf_token %}
-                                        <button type="button" class="btn-close"></button>
-                                    </form>
-                                </div>
-                            </div>
+                if (assign_list.length != 0){
+                    var color = "";
+                    var background = "";
+                    for (let i = 0; i < assign_list.length; ++i){
+                        if(assign_list[i + 2].localeCompare("blue") == 0){
+                            color = "#0085FF;";
+                            background = "rgba(0, 133, 255, .1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("green") == 0){
+                            color = "#00BA34;";
+                            background = "rgba(240, 250, 240, 1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("red") == 0){
+                            color = "#E92C2C;";
+                            background = "rgba(255, 242, 242, 1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("orange") == 0){
+                            color = "#FF9F2D;";
+                            background = "rgba(255, 245, 235, 1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("black") == 0){
+                            color = "#585757;";
+                            background = "rgba(240, 255, 240, 1);";
+                        }
+
+                        days += `<div class="d-flex">
+                                        <a tabindex="0"
+                                            class="btn m-1 p-1 truncate" 
+                                            role="button" 
+                                            data-bs-toggle="popover" 
+                                            data-bs-placement="top" 
+                                            data-bs-trigger="focus" 
+                                            data-bs-title="` + assign_list[i + 1] + `"
+                                            data-bs-content="` + assign_list[i] + `"
+                                            style="background-color:` + background + `
+                                                    border-radius: 4px; width: fit-content;
+                                                    color:` + color + `
+                                                    font-weight: 500;"> ` + 
+                                            assign_list[i] + `
+                                        </a>
+                                        <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
+                                            {% csrf_token %}
+                                            <button type="button" class="btn-close"></button>
+                                        </form>
+                                 </div>`;
+                        i += 2; 
+                    }
+                }
+
+                days += `   </div>
                          </div>`;
+
                 counter++;
                 if (counter % 7 === 0) {
                     days += `</div><div class="d-flex justify-content-center">`; // Close and start a new row
@@ -505,33 +572,79 @@
                     i === new Date().getDate() &&
                     currentMonth === new Date().getMonth() &&
                     currentYear === new Date().getFullYear();
-        
-                days += `<div class="card date ${isToday ? 'highlight' : ''}">
+
+                let assign_list = []
+                for (let i = 0; i < Deadline_date_list.length; ++i){
+                    var timeStamp = Date.parse(Deadline_date_list[i]);
+
+                    if (curDate.getTime() == timeStamp){
+                        for (let j = 0; j < Deadline_list[Deadline_date_list[i]].length; ++j){
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j]);
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j + 1]);
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j + 2]);
+                            j += 2;
+                        }
+                    }
+                }
+
+                console.log(assign_list);
+
+                days += `<div class="card date">
                             <div class="card-body d-flex flex-column padding_zero">
-                                <p class="mb-auto margin_zero dayContent">${i}</p>
-                                
-                                <div class="d-flex">
-                                    <a tabindex="0"
-                                        class="btn m-1 p-1 truncate" 
-                                        role="button" 
-                                        data-bs-toggle="popover" 
-                                        data-bs-placement="top" 
-                                        data-bs-trigger="focus" 
-                                        data-bs-title="Note Deadline"
-                                        data-bs-content="Note Content"
-                                        style="background-color: rgba(0, 133, 255, .1); 
-                                                border-radius: 4px; width: fit-content; 
-                                                color: #0085FF; 
-                                                font-weight: 500;">
-                                        Design
-                                    </a>
-                                    <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
-                                        {% csrf_token %}
-                                        <button type="button" class="btn-close"></button>
-                                    </form>
-                                </div>
-                            </div>
-                         </div>`;
+                                <p class="mb-auto ${isToday ? 'fw-bold text-primary text-decoration-underline' : ''} margin_zero dayContent">${i}</p>`;
+
+                if (assign_list.length != 0){
+                    var color = "";
+                    var background = "";
+                    for (let i = 0; i < assign_list.length; ++i){
+                        if(assign_list[i + 2].localeCompare("blue") == 0){
+                            color = "#0085FF;";
+                            background = "rgba(0, 133, 255, .1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("green") == 0){
+                            color = "#00BA34;";
+                            background = "rgba(240, 250, 240, 1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("red") == 0){
+                            color = "#E92C2C;";
+                            background = "rgba(255, 242, 242, 1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("orange") == 0){
+                            color = "#FF9F2D;";
+                            background = "rgba(255, 245, 235, 1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("black") == 0){
+                            color = "#585757;";
+                            background = "rgba(240, 255, 240, 1);";
+                        }
+
+                        days += `<div class="d-flex">
+                                        <a tabindex="0"
+                                            class="btn m-1 p-1 truncate" 
+                                            role="button" 
+                                            data-bs-toggle="popover" 
+                                            data-bs-placement="top" 
+                                            data-bs-trigger="focus" 
+                                            data-bs-title="` + assign_list[i + 1] + `"
+                                            data-bs-content="` + assign_list[i] + `"
+                                            style="background-color:` + background + `
+                                                    border-radius: 4px; width: fit-content;
+                                                    color:` + color + `
+                                                    font-weight: 500;"> ` + 
+                                            assign_list[i] + `
+                                        </a>
+                                        <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
+                                            {% csrf_token %}
+                                            <button type="button" class="btn-close"></button>
+                                        </form>
+                                    </div>`;
+                        i += 2;
+                    }
+                }
+
+                days += `   </div>
+                        </div>`;
+
                 counter++;
                 if (counter % 7 === 0) {
                     days += `</div><div class="d-flex justify-content-center">`; // Close and start a new row
@@ -543,13 +656,84 @@
             if (remainingDays < 7) {
                 for (let j = 1; j <= remainingDays; j++) {
                     const nextDate = new Date(currentYear, currentMonth + 1, j);
-                    days += `<div class="card date"> 
+
+                    let assign_list = []
+                for (let i = 0; i < Deadline_date_list.length; ++i){
+                    var timeStamp = Date.parse(Deadline_date_list[i]);
+
+                    if (nextDate.getTime() == timeStamp){
+                        for (let j = 0; j < Deadline_list[Deadline_date_list[i]].length; ++j){
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j]);
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j + 1]);
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j + 2]);
+                            j += 2;
+                        }
+                    }
+                }
+
+                days += `<div class="card date">
+                            <div class="card-body d-flex flex-column padding_zero">
+                                <p class="mb-auto margin_zero dayContent">${nextDate.getDate()}</p>`;
+
+                if (assign_list.length != 0){
+                    var color = "";
+                    var background = "";
+                    for (let i = 0; i < assign_list.length; ++i){
+                        if(assign_list[i + 2].localeCompare("blue") == 0){
+                            color = "#0085FF;";
+                            background = "rgba(0, 133, 255, .1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("green") == 0){
+                            color = "#00BA34;";
+                            background = "rgba(240, 250, 240, 1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("red") == 0){
+                            color = "#E92C2C;";
+                            background = "rgba(255, 242, 242, 1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("orange") == 0){
+                            color = "#FF9F2D;";
+                            background = "rgba(255, 245, 235, 1);";
+                        }
+                        else if (assign_list[i + 2].localeCompare("black") == 0){
+                            color = "#585757;";
+                            background = "rgba(240, 255, 240, 1);";
+                        }
+
+                        days += `<div class="d-flex">
+                                        <a tabindex="0"
+                                            class="btn m-1 p-1 truncate" 
+                                            role="button" 
+                                            data-bs-toggle="popover" 
+                                            data-bs-placement="top" 
+                                            data-bs-trigger="focus" 
+                                            data-bs-title="` + assign_list[i + 1] + `"
+                                            data-bs-content="` + assign_list[i] + `"
+                                            style="background-color:` + background + `
+                                                    border-radius: 4px; width: fit-content;
+                                                    color:` + color + `
+                                                    font-weight: 500;"> ` + 
+                                            assign_list[i] + `
+                                        </a>
+                                        <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
+                                            {% csrf_token %}
+                                            <button type="button" class="btn-close"></button>
+                                        </form>
+                                    </div>`;
+                        i += 2;
+                    }
+                }
+
+                days += `   </div>
+                        </div>`;
+
+                    {% comment %} days += `<div class="card date"> 
                                 <div class="card-body d-flex flex-column padding_zero">
                                     <p class="mb-auto margin_zero dayContent">${nextDate.getDate()}</p>
                                     <p class="dayContent">Design</p>
                                     <p class="dayContent">Note Taking</p>
                                 </div>
-                             </div>`;
+                             </div>`; {% endcomment %}
                 }
             }
         

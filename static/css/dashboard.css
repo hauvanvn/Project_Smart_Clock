@@ -93,4 +93,4 @@ body::-webkit-scrollbar {
     overflow: hidden;            /* Hide overflowing content */
     text-overflow: ellipsis;     /* Show '...' for clipped text */
     display: inline-block;       /* Allows proper width calculation */
-  }
+}
