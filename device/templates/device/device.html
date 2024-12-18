@@ -51,7 +51,7 @@
                 <ul class="dropdown-menu p-3">
                     <li>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="led_mode" id="ledMode1" checked>
+                            <input class="form-check-input" type="radio" name="led_mode" value="MODE 1" >
                             <label class="form-check-label" for="ledMode1">
                                 Mode 1
                             </label>
@@ -59,7 +59,7 @@
                     </li>
                     <li>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="led_mode" id="ledMode2">
+                            <input class="form-check-input" type="radio" name="led_mode" value="MODE 2">
                             <label class="form-check-label" for="ledMode2">
                                 Mode 2
                             </label>
@@ -67,7 +67,7 @@
                     </li>
                     <li>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="led_mode" id="ledMode3">
+                            <input class="form-check-input" type="radio" name="led_mode" value="MODE 3">
                             <label class="form-check-label" for="ledMode3">
                                 Mode 3
                             </label>
@@ -83,7 +83,7 @@
                 <ul class="dropdown-menu p-3">
                     <li>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="buzzer_mode" id="buzzerMode1" checked>
+                            <input class="form-check-input" type="radio" name="buzzer_mode" value="MODE 1">
                             <label class="form-check-label" for="buzzerMode1">
                                 Mode 1
                             </label>
@@ -91,7 +91,7 @@
                     </li>
                     <li>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="buzzer_mode" id="buzzerMode2">
+                            <input class="form-check-input" type="radio" name="buzzer_mode" value="MODE 2">
                             <label class="form-check-label" for="buzzerMode2">
                                 Mode 2
                             </label>
@@ -99,7 +99,7 @@
                     </li>
                     <li>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="buzzer_mode" id="buzzerMode3">
+                            <input class="form-check-input" type="radio" name="buzzer_mode" value="MODE 3">
                             <label class="form-check-label" for="buzzerMode3">
                                 Mode 3
                             </label>
@@ -270,8 +270,9 @@
             <div class="card" style="min-width: 70%; border-radius: 50px">
                 <div class="card-body p-4" style="font-size: 45px">
                     <ul>
-                        <li>13:00 Create UI design for website</li>
-                        <li>19:00 Write proposal</li>
+                        {% for today in today_events %}
+                            <li>{{today}}</li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
@@ -399,6 +400,22 @@
         // Kết nối WebSocket
         const socket = new WebSocket('ws://127.0.0.1:8000/ws/mqtt/front-end');
 
+        let currentLedMode = "{{ device.ledmode }}";
+        const currentBuzzerMode = "{{ device.buzzermode }}";
+
+        // Gửi data về server
+        function sendData(data) {
+            if (socket.readyState == WebSocket.OPEN) {
+                socket.send(JSON.stringify(data))
+                console.log("Sended data: ", data)
+            } else {
+                socket.addEventListener('open', function() {
+                    socket.send(JSON.stringify(data))
+                    console.log("Connection open - sended data: ", data)
+                }, {once: true})
+            }
+        }
+
         // Khi kết nối thành công
         socket.onopen = function () {
             console.log("WebSocket connection established.");
@@ -408,6 +425,11 @@
         socket.onmessage = function (event) {
             const data = JSON.parse(event.data);
             console.log("Received data:", data);
+
+            const deviceId = data.device_id;
+            if (deviceId == {{ device.id }}) {
+                currentLedMode = data.ledMode;
+            }
         };
 
         // Khi WebSocket đóng
@@ -415,6 +437,49 @@
             console.log("WebSocket connection closed.");
         };
         
+        // Chỉnh Led và BuzzerBuzzer mode
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Hiện led mode
+            const radioLedButtons = document.querySelectorAll('input[name="led_mode"]');
+            radioLedButtons.forEach((radio) => {
+                if (radio.value == currentLedMode) {
+                    radio.checked = true;
+                }
+            });
+
+            // Hiện buzzer mode
+            const radioBuzzerButtons = document.querySelectorAll('input[name="buzzer_mode"]');
+            radioBuzzerButtons.forEach((radio) => {
+                if (radio.value == currentBuzzerMode) {
+                    radio.checked = true;
+                }
+            });
+
+            // Nhận led mode mới
+            radioLedButtons.forEach((radio) => {
+                radio.addEventListener("change", function() {
+                    if (this.checked) {
+                        console.log("Selected LED mode: ", this.value)
+
+                        sendData({device_id: "{{ device.id }}", command: "change_led_mode", newMode: this.value})
+                    }
+                })
+            })
+
+            // Nhận buzzer mode mới
+            radioBuzzerButtons.forEach((radio) => {
+                radio.addEventListener("change", function() {
+                    if (this.checked) {
+                        console.log("Selected Buzzer mode: ", this.value)
+
+                        sendData({device_id: "{{ device.id }}", command: "change_buzzer_mode", newMode: this.value})
+                    }
+                })
+            })
+        });
+
+        // Cập nhật thời gian thựcthực
         function updateTime() {
             // Lấy phần tử hiển thị thời gian
             const clockElement = document.getElementById('real-time-clock');
@@ -549,7 +614,7 @@
                                         </a>
                                         <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
                                             {% csrf_token %}
-                                            <button type="button" class="btn-close"></button>
+                                            <button type="submit" value="event_id" name="delete_event" class="btn-close"></button>
                                         </form>
                                  </div>`;
                         i += 2; 
@@ -635,7 +700,7 @@
                                         </a>
                                         <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
                                             {% csrf_token %}
-                                            <button type="button" class="btn-close"></button>
+                                            <button type="submit" value="event_id" name="delete_event" class="btn-close"></button>
                                         </form>
                                     </div>`;
                         i += 2;
@@ -717,7 +782,7 @@
                                         </a>
                                         <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
                                             {% csrf_token %}
-                                            <button type="button" class="btn-close"></button>
+                                            <button type="submit" value="event_id" name="delete_event" class="btn-close"></button>
                                         </form>
                                     </div>`;
                         i += 2;

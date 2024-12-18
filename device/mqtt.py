@@ -4,10 +4,12 @@ import websockets
 from channels.layers import get_channel_layer
 import paho.mqtt.client as mqtt
 from django.conf import settings
-from .models import THdata, Devices
+from .models import THdata, Devices, DeviceEvent, DeviceArlam
 import json
 import time
 import threading
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 # Send device status to Front-end
 channel_layer = get_channel_layer()
@@ -23,12 +25,25 @@ def handle_device_status_message(device_id, status):
         }
     )
 
+def handle_device_LedMode_message(device_id, ledMode):
+    async_to_sync(channel_layer.group_send)(
+        "mqtt_front_end",
+        {
+            "type": "send_event",
+            "message": {
+                "device_id": device_id,
+                "ledMode": ledMode
+            },
+        }
+    )
+
 mqtt_clients = {}
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         topic = userdata.get('TOPIC', 'default/topic')
         client.subscribe(topic)
+
         print(f"Subscribed to topic: {topic}")
     else:
         print(f"Failed to connect, return code {rc}")
@@ -52,6 +67,17 @@ def on_message(client, userdata, msg):
     device = Devices.objects.get(id=device_id)
 
     payload = json.loads(msg.payload.decode('utf-8'))
+    if ("change_led_mode" in payload):
+        if device.ledmode == "MODE 1":
+            device.ledmode = "MODE 2"
+        elif device.ledmode == "MODE 2":
+            device.ledmode = "MODE 3"
+        else: 
+            device.ledmode = "MODE 1"
+
+        device.save()
+        handle_device_LedMode_message(device.id, device.ledmode)
+
     # temp = payload.get("temperature")
     # humi = payload.get("humidity")
     # THdata.objects.create(device=device,temperature=temp,humidity=humi)
@@ -154,6 +180,58 @@ async def websocket_client():
 def create_client():
     asyncio.run(websocket_client())
 
+stop_thread_mqtt_event = threading.Event()
+def send_data():
+    while not stop_thread_mqtt_event.is_set():
+        devices = [device for device in Devices.objects.all() if check_connection(device.id)]
+
+        for device in devices:
+            current_time = datetime.now(ZoneInfo(device.timezone))
+            timee = current_time.strftime("%H%M%S")
+            date = current_time.strftime("%a, %b %d, %Y")
+            arlamSig = False
+            event_1 = ""
+            event_2 = ""
+
+            # Nearest 2 event
+            events = DeviceEvent.objects.filter(device=device)
+            today_event = []
+            if (events.exists()):
+                events = events.filter(time__date=datetime.today()).order_by("time")
+                events = [x for x in events if not x.is_past_event()]
+                for event in events:
+                    today_event.append(f"{event.time.strftime("%H:%M")} {event.note}")
+            if (len(today_event) >= 1): 
+                event_1 = today_event[0]
+            if (len(today_event) >= 2): 
+                event_2 = today_event[1]
+
+            # Nearest arlam
+            arlam = []
+            if DeviceArlam.objects.filter(device=device).exists():
+                arlams = [x for x in DeviceArlam.objects.filter(device=device).order_by('time') if x.is_past_arlam()]
+                if len(arlams) != 0:
+                    arlam = min(arlams, key=lambda date: abs(date.time - datetime.now()))
+            if arlam != [] and abs(arlam.time - datetime.now()) <= timedelta(seconds=1):
+                arlamSig = True
+
+            # Send data to Client
+            topic = f"{settings.MAIN_TOPIC}/{device.id}/inp"
+            data = {
+                "time": timee, 
+                "date": date,
+                "arlamSig": arlamSig,
+                "event_1": event_1,
+                "event_2": event_2,
+                "led": device.ledmode, 
+                "buzzer": device.buzzermode
+                }
+            client = get_mqtt_client(device.id)
+            client.publish(topic, json.dumps(data))
+            # print(f"Sended to {topic}: {json.dumps(data)}")
+
+        time.sleep(0.5)
+
 def initialize_mqtt_clients():
     devices = Devices.objects.all()
     for device in devices:
@@ -161,8 +239,10 @@ def initialize_mqtt_clients():
         create_mqtt_client(device.id, topic)
     print(f"Initialized MQTT clients for {len(devices)} devices.")
 
-    thread = threading.Thread(target=create_client)
-    thread.start()
+    thread_socket = threading.Thread(target=create_client)
+    # thread_mqtt = threading.Thread(target=send_data)
+    thread_socket.start()
+    # thread_mqtt.start()
 
     try:
         while True:
@@ -174,6 +254,7 @@ def initialize_mqtt_clients():
             # print("Next_loop")
     except KeyboardInterrupt:
         counter = 0
+        stop_thread_mqtt_event.set()
         for device_id in list(mqtt_clients.keys()):
             stop_mqt_client(device_id)
             counter += 1
