@@ -56,63 +56,96 @@ def convert2Fahrenheit(celsius):
 def get_THdata_average(type, device_id, date):
     if type == "hourly":
         # Hourly data
-        start_time = date.repalce(hour=date.hour, minute=0, second=0, microsecond=0)
+        start_time = date.replace(hour=date.hour, minute=0, second=0, microsecond=0)
         end_time = start_time + timedelta(hours=1)
 
-        hourly_avg = THdata.objects.filter(
-            device=device_id, 
-            timestamp__range=(start_time,end_time)
-        ).aaggregate(
-            temp = Avg('temperature'),
-            humi = Avg('humidity')
-        )
+        if THdata.objects.filter(device=device_id, 
+                                 timestamp__range=(start_time,end_time)).exists():
+            hourly_avg = THdata.objects.filter(
+                device=device_id, 
+                timestamp__range=(start_time,end_time)
+            ).aggregate(
+                temp = Avg('temperature'),
+                humi = Avg('humidity')
+            )
+        else:
+            return {
+                'temp': 0,
+                'humi': 0
+            }
+
         return hourly_avg
     elif type == "daily":
         # Daily data
-        daily_avg = THdata.objects.filter(
-            device=device_id,
-            timestamp__date=date
-        ).aaggregate(
-            avg_temp=Avg('temperature'),
-            avg_humi=Avg('humidity')
-        )
+        if THdata.objects.filter(device=device_id,
+                                 timestamp__date=date).exists():
+            daily_avg = THdata.objects.filter(
+                device=device_id,
+                timestamp__date=date
+            ).aaggregate(
+                avg_temp=Avg('temperature'),
+                avg_humi=Avg('humidity')
+            )
+        else:
+            return {
+                'temp': 0,
+                'humi': 0
+            }
         return daily_avg
     elif type == "monthly":
         # Monthly data
-        monthly_avg = THdata.objects.filter(
-            device=device_id,
-            timestamp__year=date.year,
-            timestamp__month=date.month
-        ).aaggregate(
-            avg_temp=Avg('temperature'),
-            avg_humi=Avg('humidity')
-        )
+        if THdata.objects.filter(device=device_id,
+                                 timestamp__year=date.year,
+                                 timestamp__month=date.month).exists():
+            
+            monthly_avg = THdata.objects.filter(
+                device=device_id,
+                timestamp__year=date.year,
+                timestamp__month=date.month
+            ).aggregate(
+                avg_temp=Avg('temperature'),
+                avg_humi=Avg('humidity')
+            )
+        else:
+            return {
+                'temp': 0,
+                'humi': 0
+            }
         return monthly_avg
     else:
         # Yearly data
-        yearly_avg = THdata.objects.filter(
-            device=device_id,
-            timestamp__year=date.year
-        ).aaggregate(
-            avg_temp=Avg('temperature'),
-            avg_humi=Avg('humidity')
-        )
+        if THdata.objects.filter(device=device_id,
+                                 timestamp__year=date.year).exists():
+            yearly_avg = THdata.objects.filter(
+                device=device_id,
+                timestamp__year=date.year
+            ).aggregate(
+                avg_temp=Avg('temperature'),
+                avg_humi=Avg('humidity')
+            )
+        else:
+            return {
+                'temp': 0,
+                'humi': 0
+            }
         return yearly_avg
 
 def get_THdata_list(type, device_id, date):
+     
      if type == "daily":
         daily_temp = []
         daily_humi = []
 
-        for hour in range(24):
-            data = get_THdata_average("hourly", device_id, date.replace(hour=hour, minute=0, second=0, microsecond=0))
+        for Hour in range(24):
+            data = get_THdata_average("hourly", device_id, date.replace(hour=Hour, minute=0, second=0))
+            
             daily_temp.append(data["temp"])
             daily_humi.append(data["humi"])
         return daily_temp, daily_humi
      elif type == "monthly":
         monthly_temp = []
         monthly_humi = []
-        days_in_month = (date.repalce(day=28) + timedelta(days=4)).day
+        days_in_month = (date.replace(day=28) + timedelta(days=4)).day
 
         for day in range(1, days_in_month+1):
             data = get_THdata_average("daily", device_id, date.replace(day=day, hour=0, minute=0, second=0, microsecond=0))
