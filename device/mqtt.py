@@ -19,8 +19,10 @@ def handle_device_status_message(device_id, status):
         {
             "type": "send_event",
             "message": {
-                "device_id": device_id,
-                "status": status,
+                "device_status": {
+                    "device_id": device_id,
+                    "status": status,
+                }
             },
         }
     )
@@ -31,8 +33,10 @@ def handle_device_LedMode_message(device_id, ledMode):
         {
             "type": "send_event",
             "message": {
-                "device_id": device_id,
-                "ledMode": ledMode
+                "change_ledmode": {
+                    "device_id": device_id,
+                    "ledMode": ledMode
+                }
             },
         }
     )

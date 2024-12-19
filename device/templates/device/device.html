@@ -423,12 +423,21 @@
 
         // Khi nhận được tin nhắn từ server
         socket.onmessage = function (event) {
-            const data = JSON.parse(event.data);
-            console.log("Received data:", data);
+            let data = JSON.parse(event.data);
 
-            const deviceId = data.device_id;
-            if (deviceId == {{ device.id }}) {
-                currentLedMode = data.ledMode;
+            if (data.change_ledmode !== undefined) {
+                data = data.change_ledmode
+                const deviceId = data.device_id;
+                if (deviceId == "{{ device.id }}") {
+                    if (data.ledMode !== undefined) {
+                        currentLedMode = data.ledMode;
+
+                        const radioLedButtons = document.querySelectorAll('input[name="led_mode"]');
+                        radioLedButtons.forEach((radio) => {
+                            radio.checked = (radio.value == currentLedMode);
+                        });
+                    }
+                }
             }
         };
 
@@ -443,17 +452,13 @@
             // Hiện led mode
             const radioLedButtons = document.querySelectorAll('input[name="led_mode"]');
             radioLedButtons.forEach((radio) => {
-                if (radio.value == currentLedMode) {
-                    radio.checked = true;
-                }
+                radio.checked = (radio.value == currentLedMode);
             });
 
             // Hiện buzzer mode
             const radioBuzzerButtons = document.querySelectorAll('input[name="buzzer_mode"]');
             radioBuzzerButtons.forEach((radio) => {
-                if (radio.value == currentBuzzerMode) {
-                    radio.checked = true;
-                }
+                radio.checked = (radio.value == currentBuzzerMode);
             });
 
             // Nhận led mode mới
