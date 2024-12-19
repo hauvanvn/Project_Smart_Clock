@@ -117,5 +117,48 @@ def logoutPage(request):
     logout(request)
     return redirect('users:login')
 
+@login_required(login_url='users:login')
 def accountPage(request):
-    return render(request, 'user/account.html')
+    user = request.user
+
+    if request.method == "POST":
+        # Change username
+        if "change_username" in request.POST:
+            new_name = request.POST.get("new_username")
+            if User.objects.filter(username=new_name).exists():
+                messages.error(request, "Username existed!")
+                return redirect('users:profile')
+            
+            user.username = new_name
+            user.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, "Change username successful!")
+            return redirect('users:profile')
+        # Change pass
+        elif "change_pass" in request.POST:
+            oldPass = request.POST.get("origin_pass")
+            newPass1 = request.POST.get("new_pass1")
+            newPass2 = request.POST.get("new_pass2")
+
+            if user.check_password(oldPass):
+                if newPass1 == newPass2:
+                    user.set_password(newPass1)
+                    user.save()
+                    update_session_auth_hash(request, user)
+                    messages.success(request, "Change password successful!")
+                    return redirect('users:profile')
+                else:
+                    messages.warning(request, "New password not match to Verify password!")
+                    return redirect('users:profile')
+            else:
+                messages.warning(request, "Your old password is not correct!")
+                return redirect('users:profile')
+        # Change avarta
+        elif "change_avarta" in request.POST:
+            avatar = request.FILES['img']
+            user.avatar = avatar
+            user.save()
+            messages.success(request, "Change avatar successful!")
+            return redirect('users:profile')
+
+    return render(request, 'user/account.html', {"user": user})

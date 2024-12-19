@@ -61,31 +61,33 @@
         <div class="m-5 p-4" style="border: solid 4px #4F378A">
             <div class="row">
                 <div class="col-4">
-                    <p class="fw-bold fs-3">Nickname: Nguyen Van Duc</p>
-                    <form>
+                    <p class="fw-bold fs-3">Username: {{ user.username }}</p>
+                    <form method="POST">
+                        {% csrf_token %}
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="new_nickname" placeholder="New nickname" required>
+                            <input type="text" name="new_username" class="form-control" id="new_nickname" placeholder="New nickname" required>
                         </div>
 
-                        <button type="submit" class="btn btn-primary border-0 submitBtn">Submit</button>
+                        <button type="submit" name="change_username" class="btn btn-primary border-0 submitBtn">Submit</button>
                     </form>
 
-                    <p class="fw-bold fs-3 mt-3">Password: **********</p>
+                    <p class="fw-bold fs-3 mt-3">Password: ********</p>
 
-                    <form>
+                    <form method="POST">
+                        {% csrf_token %}
                         <div class="mb-3">
-                            <input type="password" class="form-control" id="origin_pass" placeholder="Old password" required>
+                            <input type="password" name="origin_pass" class="form-control" id="origin_pass" placeholder="Old password" required>
                         </div>
 
                         <div class="mb-3">
-                            <input type="password" class="form-control" id="new_pass1" placeholder="New password" required>
+                            <input type="password" name="new_pass1" class="form-control" id="new_pass1" placeholder="New password" required>
                         </div>
 
                         <div class="mb-3">
-                            <input type="password" class="form-control" id="new_pass2" placeholder="Confirm password" required>
+                            <input type="password" name="new_pass2" class="form-control" id="new_pass2" placeholder="Confirm password" required>
                         </div>
 
-                        <button type="submit" class="btn btn-primary border-0 submitBtn">Submit</button>
+                        <button type="submit" name="change_pass" class="btn btn-primary border-0 submitBtn">Submit</button>
                     </form>
                 </div>
 
