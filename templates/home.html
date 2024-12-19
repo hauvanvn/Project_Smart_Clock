@@ -54,7 +54,7 @@
     <div class="welcome_block">
         <div class="d-flex flex-row-reverse">
             <div class="dropdown" style="padding: 10px 30px 10px 0px">
-                <img src="{{ user.avatar.url }}" alt="Avatar">
+                <img src="{{ user.avatar.url }}" alt="Avatar" class="header_avatar">
                 <div class="dropdown-content">
                     <a href="{% url "users:profile" %}">View Account</a>
                     <a href="{% url "users:logout" %}">Logout</a>
@@ -140,6 +140,15 @@
             </button>
             <p style="padding-top: 15px; color: #EDE2FF;">Add device</p>
         </div>
+
+        {% if messages %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                <strong>Hey! </strong> {{message}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="deviceLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">

@@ -19,6 +19,16 @@
             
             <button type="submit" class="w-100 btn btn-dark btn-md mb-4">Sign In</button>
         </form>
+        
+        {% if messages %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                <strong>Hey! </strong> {{message}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <div class="d-flex">
             <a href="{% url 'users:resetPass' %}" id="form_label" style="font-size: 15px; text-decoration: underline;">Forgot password?</a>
             <a href="{% url 'users:signup' %}" id="form_label" class="ms-auto" style="font-size: 15px; text-decoration: underline;">Sign Up Here</a>

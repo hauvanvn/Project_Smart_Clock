@@ -14,6 +14,16 @@
             
             <button type="submit" class="w-100 btn btn-dark btn-md mb-4">Get OTP</button>
         </form>
+
+        {% if messages %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                <strong>Hey! </strong> {{message}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <div class="d-flex justify-content-center">
             <a href="{% url 'users:login' %}" id="form_label" style="font-size: 15px; text-decoration: underline;">Go back to Sign In</a>
         </div>

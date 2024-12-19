@@ -110,7 +110,7 @@
             </div>
            
             <div class="dropdown" style="padding: 10px 30px 10px 0px">
-                <img src="{{ user.avatar.url }}" alt="Avatar">
+                <img src="{{ user.avatar.url }}" alt="Avatar" class="header_avatar">
                 <div class="dropdown-content">
                     <a href="{% url "users:profile" %}">View Account</a>
                     <a href="{% url 'users:logout' %}">Logout</a>
