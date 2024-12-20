@@ -147,6 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "user.User"
 
 # MQTT
-BROKER = "test.mosquitto.org"  # Replace with your broker address
+# BROKER = "test.mosquitto.org"  # Replace with your broker address
+BROKER = "broker.hivemq.com"  # Replace with your broker address
 PORT = 1883  # Default MQTT port for Wokwi
 MAIN_TOPIC = "nhom11_ly2_hcmusk22"

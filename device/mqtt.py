@@ -4,7 +4,8 @@ import websockets
 from channels.layers import get_channel_layer
 import paho.mqtt.client as mqtt
 from django.conf import settings
-from .models import THdata, Devices, DeviceEvent, DeviceArlam
+from .models import THdata, Devices, DeviceEvent, DeviceArlam, AggregateData
+from django.db.models import Avg
 import json
 import time
 import threading
@@ -13,12 +14,13 @@ from zoneinfo import ZoneInfo
 
 # Send device status to Front-end
 channel_layer = get_channel_layer()
-def handle_device_status_message(device_id, status):
+def handle_device_status_message(user, device_id, status):
     async_to_sync(channel_layer.group_send)(
         "mqtt_front_end",
         {
             "type": "send_event",
             "message": {
+                "user": user,
                 "device_status": {
                     "device_id": device_id,
                     "status": status,
@@ -27,15 +29,32 @@ def handle_device_status_message(device_id, status):
         }
     )
 
-def handle_device_LedMode_message(device_id, ledMode):
+def handle_device_LedMode_message(user, device_id, ledMode):
     async_to_sync(channel_layer.group_send)(
         "mqtt_front_end",
         {
             "type": "send_event",
             "message": {
+                "user": user,
+                "deviceId": device_id,
                 "change_ledmode": {
-                    "device_id": device_id,
                     "ledMode": ledMode
+                }
+            },
+        }
+    )
+
+def handle_device_dht22_message(user, device_id, temp, humi):
+    async_to_sync(channel_layer.group_send)(
+        "mqtt_front_end",
+        {
+            "type": "send_event",
+            "message": {
+                "user": user,
+                "deviceId": device_id,
+                "dht22": {
+                    "temp": temp,
+                    "humi": humi
                 }
             },
         }
@@ -67,8 +86,8 @@ def on_message(client, userdata, msg):
         "time": time.time()
     }
     status = "Connected" if check_connection(device_id) else "Disconnected"
-    handle_device_status_message(device_id, status)
     device = Devices.objects.get(id=device_id)
+    handle_device_status_message(device.owner.username, device_id, status)
 
     payload = json.loads(msg.payload.decode('utf-8'))
     if ("change_led_mode" in payload):
@@ -80,11 +99,15 @@ def on_message(client, userdata, msg):
             device.ledmode = "MODE 1"
 
         device.save()
-        handle_device_LedMode_message(device.id, device.ledmode)
+        handle_device_LedMode_message(device.owner.username, device.id, device.ledmode)
+    
+    if ("dht22" in payload):
+        temp = payload.get("temperature")
+        humi = payload.get("humidity")
 
-    # temp = payload.get("temperature")
-    # humi = payload.get("humidity")
-    # THdata.objects.create(device=device,temperature=temp,humidity=humi)
+        device = Devices.objects.get(id=device_id)
+        handle_device_dht22_message(device.owner.username, device.id, temp, humi)
+        THdata.objects.create(device=device,temperature=temp,humidity=humi)
 
 
     print(f"Received message on topic {msg.topic}: {msg.payload.decode('utf-8')}")
@@ -236,6 +259,38 @@ def send_data():
 
         time.sleep(0.5)
 
+stop_thread_aggregation_event = threading.Event()
+def aggregationData():
+    pre_time = time.time()
+    while not stop_thread_aggregation_event.is_set():
+        if time.time() - pre_time >= 3600:
+            devices = [device for device in Devices.objects.all() if check_connection(device.id)]
+            for device in devices:
+                date = datetime.now()
+                avg_temp = 0
+                avg_humi = 0
+                start_time = date.replace(hour=date.hour, minute=0, second=0, microsecond=0)
+                end_time = start_time + timedelta(hours=1)
+
+                if THdata.objects.filter(device=device, 
+                                        timestamp__range=(start_time,end_time)).exists():
+                    hourly_avg = THdata.objects.filter(
+                        device=device, 
+                        timestamp__range=(start_time,end_time)
+                    ).aggregate(
+                        avg_temp = Avg('temperature'),
+                        avg_humi = Avg('humidity')
+                    )
+                    avg_temp = hourly_avg["avg_temp"]
+                    avg_humi = hourly_avg["avg_humi"]
+                
+                AggregateData.objects.create(device=device, avg_temperature=avg_temp, avg_humidity=avg_humi)
+
+            pre_time = time.time()
+
+        time.sleep(10)
+
+
 def initialize_mqtt_clients():
     devices = Devices.objects.all()
     for device in devices:
@@ -245,24 +300,31 @@ def initialize_mqtt_clients():
 
     thread_socket = threading.Thread(target=create_client)
     # thread_mqtt = threading.Thread(target=send_data)
+    # thread_aggregation = threading.Thread(target=aggregationData)
     thread_socket.start()
     # thread_mqtt.start()
+    # thread_aggregation.start()
 
     try:
         while True:
             for device_id in mqtt_clients:
                 status = "Connected" if check_connection(device_id) else "Disconnected"
                 # print(f"Check connection of {device_id}: {status}")
-                handle_device_status_message(device_id, status)
+                device = Devices.objects.get(id=device_id)
+                handle_device_status_message(device.owner.username, device_id, status)
             time.sleep(5)
             # print("Next_loop")
     except KeyboardInterrupt:
         counter = 0
         stop_thread_mqtt_event.set()
+        stop_thread_aggregation_event.set()
+        heartbeat_stop_event.set()
         for device_id in list(mqtt_clients.keys()):
             stop_mqt_client(device_id)
             counter += 1
         
+        thread_socket.join()
+        # thread_mqtt.join()
+        # thread_aggregation.join()
         print(f"Stopped MQTT clients for {counter} devices.")
         
-        heartbeat_stop_event.set()

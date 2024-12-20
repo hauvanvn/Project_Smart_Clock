@@ -6,7 +6,25 @@ django.setup()
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from asgiref.sync import sync_to_async
 from .models import Devices
+from .utils import send_changeChart, get_THdata_list
+from datetime import datetime
+
+@sync_to_async
+def handle_changeChart(data):
+    type = "daily"
+    if data["dateForm"] == '1':
+        type = "daily"
+    elif data["dateForm"] == '2':
+        type = "monthly"
+    elif data["dateForm"] == '3':
+        type = "yearly"
+
+    date = datetime.strptime(data["date"], "%Y-%m-%d")
+    temp, humi = get_THdata_list(type, data["device_id"], date)
+
+    send_changeChart(data["user"], data["device_id"], temp, humi)
 
 class MQTTFrontEndConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
@@ -42,8 +60,10 @@ class MQTTFrontEndConsumer(AsyncWebsocketConsumer):
             device = await self.get_device(data["device_id"])
             device.buzzermode = data["newMode"]
             await self.save_device(device)
+        elif data["command"] == "change_chart_type":
+            await handle_changeChart(data)
 
-        print(f"Back-End received from front-end: {data}")
+        # print(f"Back-End received from front-end: {data}")
 
     async def send_event(self, event):
         await self.send(text_data=json.dumps(event["message"]))

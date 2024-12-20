@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .utils import send_deviceData
 from .models import Devices, DeviceEvent, DeviceArlam
 from .forms import ArlarmForm, EventForm
 from zoneinfo import ZoneInfo

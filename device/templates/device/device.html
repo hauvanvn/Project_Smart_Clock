@@ -225,7 +225,7 @@
             <div class="col-6 d-flex justify-content-center">
                 <div class="card statistic_data border-0" style="background: linear-gradient(90deg, rgba(217, 217, 217, 0.7) 5.1%, rgba(216, 31, 31, 0.6) 58.1%)">
                     <div class="card-body text-center fw-bold" style="font-size: 30px">
-                        <p>24°C</p>
+                        <p id="curTemp">--°C</p>
                         <p>Tempature</p>
                     </div>
                 </div>
@@ -235,7 +235,7 @@
             <div class="col-6 d-flex justify-content-center">
                 <div class="card statistic_data border-0" style="background: linear-gradient(90deg, rgba(217, 217, 217, 0.7) 3.6%, rgba(31, 98, 216, 0.6) 58.1%)">
                     <div class="card-body text-center fw-bold" style="font-size: 30px">
-                        <p>70%</p>
+                        <p id="curHumi">--%</p>
                         <p>Humidity</p>
                     </div>
                 </div>
@@ -256,7 +256,7 @@
             <form class="row row-cols-lg-auto g-3 align-items-center mt-3">
                 <div class="col-12">
                     <select class="form-select" id="time_format">
-                            <option value="1">Day</option>
+                            <option value="1" selected>Day</option>
                             <option value="2">Month</option>
                             <option value="3">Year</option>
                     </select>
@@ -415,11 +415,11 @@
         function sendData(data) {
             if (socket.readyState == WebSocket.OPEN) {
                 socket.send(JSON.stringify(data))
-                console.log("Sended data: ", data)
+                // console.log("Sended data: ", data)
             } else {
                 socket.addEventListener('open', function() {
                     socket.send(JSON.stringify(data))
-                    console.log("Connection open - sended data: ", data)
+                    // console.log("Connection open - sended data: ", data)
                 }, {once: true})
             }
         }
@@ -431,12 +431,13 @@
 
         // Khi nhận được tin nhắn từ server
         socket.onmessage = function (event) {
-            let data = JSON.parse(event.data);
+            const message = JSON.parse(event.data);
 
-            if (data.change_ledmode !== undefined) {
-                data = data.change_ledmode
-                const deviceId = data.device_id;
-                if (deviceId == "{{ device.id }}") {
+            if (message.user == "{{ user.username }}" && message.deviceId == "{{ device.id }}")
+            {
+                // Led mode
+                if (message.change_ledmode !== undefined) {
+                    const data = message.change_ledmode
                     if (data.ledMode !== undefined) {
                         currentLedMode = data.ledMode;
 
@@ -445,6 +446,28 @@
                             radio.checked = (radio.value == currentLedMode);
                         });
                     }
+                }
+                
+                // Tempature and Humidity
+                if (message.dht22 !== undefined) {
+                    const temp = message.dht22.temp;
+                    const humi = message.dht22.humi;
+
+                    const TempatureElement = document.getElementById("curTemp");
+                    if (TempatureElement) {
+                        TempatureElement.textContent = String(temp) + "°C";
+                    }
+                    const HumidityElement = document.getElementById("curHumi");
+                    if (HumidityElement) {
+                        HumidityElement.textContent = String(humi) + "%";
+                    }
+                }
+
+                console.log(message.dht22_data)
+                if (message.dht22_data !== undefined) {
+                    tempData = message.dht22_data.temp;
+                    humiData = message.dht22_data.humi;
+                    updateChart();
                 }
             }
         };
@@ -473,7 +496,7 @@
             radioLedButtons.forEach((radio) => {
                 radio.addEventListener("change", function() {
                     if (this.checked) {
-                        console.log("Selected LED mode: ", this.value)
+                        // console.log("Selected LED mode: ", this.value)
 
                         sendData({device_id: "{{ device.id }}", command: "change_led_mode", newMode: this.value})
                     }
@@ -484,12 +507,15 @@
             radioBuzzerButtons.forEach((radio) => {
                 radio.addEventListener("change", function() {
                     if (this.checked) {
-                        console.log("Selected Buzzer mode: ", this.value)
+                        // console.log("Selected Buzzer mode: ", this.value)
 
-                        sendData({device_id: "{{ device.id }}", command: "change_buzzer_mode", newMode: this.value})
+                        sendData({ device_id: "{{ device.id }}", command: "change_buzzer_mode", newMode: this.value})
                     }
                 })
             })
+
+            // Tự động nhập giá trị ngày hôm nay cho specific date của Chart
+            timeInputs.value = getToDay();
         });
 
         // Cập nhật thời gian thựcthực
@@ -516,20 +542,106 @@
 
                 // Hiển thị thời gian mới
                 clockElement.textContent = `${hours}: ${minutes}: ${seconds}`;
-            }, 970);
+            }, 990);
         }
 
+        // Lấy filter cho chart
+        const timeFormatSelect = document.getElementById('time_format');
+        const timeInput = document.getElementById('time_inp');
+        timeInput.value = getToDay();
+        let [y, m, d] = timeInput.value.split('-');
+
+        function createMonthLabel(month, year) {
+            const daysInMonth = new Date(year, month, 0).getDate();
+            return Array.from({ length: daysInMonth }, (_, i) => String(i + 1));
+        }
+
+        // Cập nhật làm chart
+        function updateChart() {
+            const selectedValue = timeFormatSelect.value;
+
+            if (selectedValue == "1") {
+                labelX = DateLabel;
+            } else if (selectedValue == "2") {
+                labelX = createMonthLabel(m, y);
+            } else if (selectedValue == "3") {
+                labelX = YearLabel;
+            }
+
+            // Cập nhập trục XX
+            temp_Chart.data.labels = labelX;
+            humid_Chart2.data.labels = labelX;
+
+            // Cập nhật data
+            temp_Chart.data.datasets[0].data = tempData;
+            humid_Chart2.data.datasets[0].data = humiData;
+
+            // Cập nhật Chart
+            temp_Chart.update();
+            humid_Chart2.update();
+        }
+
+        function getToDay() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        // Lắng nghe sự thay đổi trên select
+        timeFormatSelect.addEventListener('change', () => {
+            sendData({
+                user: "{{ user.username }}",
+                device_id: "{{ device.id }}", 
+                command: "change_chart_type", 
+                dateForm: timeFormatSelect.value,
+                date: timeInput.value
+            })
+            // updateChart();
+        });
+        // Lắng nghe sự thay đổi trên input
+        timeInput.addEventListener('input', () => {
+            [y, m, d] = timeInput.value.split('-');
+            sendData({
+                user: "{{ user.username }}",
+                device_id: "{{ device.id }}", 
+                command: "change_chart_type", 
+                dateForm: timeFormatSelect.value,
+                date: timeInput.value
+            })
+            // updateChart();
+        });
+
         //Graph scripts:
+        // Label
+        const DateLabel = Array.from({ length: 24 }, (_, i) => String(i));
+        let MonthLabel = createMonthLabel(m, y);
+        const YearLabel = Array.from({ length: 12 }, (_, i) => String(i + 1));
+        let labelX = DateLabel
+
+        // data
+        let tempData = []
+        let humiData = []
+        sendData({
+            user: "{{ user.username }}",
+            device_id: "{{ device.id }}", 
+            command: "change_chart_type", 
+            dateForm: timeFormatSelect.value,
+            date: timeInput.value
+        })
+
         const ctx1 = document.getElementById('temp_chart').getContext('2d');
         const ctx2 = document.getElementById('humid_chart').getContext('2d');
         // Dữ liệu và cấu hình biểu đồ
         const temp_Chart = new Chart(ctx1, {
             type: 'line', 
             data: {
-                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5'], // Trục X
+                labels: labelX, // Trục X
                 datasets: [{
                     label: 'Tempature',
-                    data: [12, 19, 3, 5, 2], // Dữ liệu trục Y
+                    data: tempData, // Dữ liệu trục Y
                     borderColor: 'rgb(216, 76, 48)', // Màu đường
                     backgroundColor: 'rgba(75, 192, 192, 0.2)', // Màu nền
                     borderWidth: 2
@@ -547,10 +659,10 @@
         const humid_Chart2 = new Chart(ctx2, {
             type: 'line', // Loại biểu đồ: 'line', 'bar', 'pie', v.v.
             data: {
-                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5'], // Trục X
+                labels: labelX, // Trục X
                 datasets: [{
                     label: 'Humidity',
-                    data: [12, 19, 3, 5, 2], // Dữ liệu trục Y
+                    data: humiData, // Dữ liệu trục Y
                     borderColor: 'rgba(75, 192, 192, 1)', // Màu đường
                     backgroundColor: 'rgba(75, 192, 192, 0.2)', // Màu nền
                     borderWidth: 2
@@ -572,7 +684,6 @@
         const next = document.getElementById('next');
 
         const eventList = {{events|safe}};
-        console.log(eventList);
 
         let currentDate = new Date();
         let content = '';
@@ -605,7 +716,6 @@
                 i += 5;
             }
             const Deadline_date_list = Object.keys(Deadline_list);
-            console.log(Deadline_list);
 
             let days = `<div class="d-flex justify-content-center">`; // Start a new row
             let counter = 0;
@@ -711,8 +821,6 @@
                         }
                     }
                 }
-
-                console.log(assign_list);
 
                 days += `<div class="card date">
                             <div class="card-body d-flex flex-column padding_zero">

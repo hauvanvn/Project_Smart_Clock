@@ -50,7 +50,16 @@ class THdata(models.Model):
     device = models.ForeignKey(Devices, on_delete=models.CASCADE, null=True)
     temperature = models.FloatField()
     humidity = models.FloatField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField()
+    # timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.timestamp}: Temp={self.temperature}, Hum={self.humidity}"
+    
+class AggregateData(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    device = models.ForeignKey(Devices, on_delete=models.CASCADE, null=True)
+    avg_temperature = models.FloatField()
+    avg_humidity = models.FloatField()
+    # timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField()

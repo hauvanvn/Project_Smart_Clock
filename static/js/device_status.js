@@ -10,7 +10,7 @@ socket.onopen = function () {
 socket.onmessage = function (event) {
     let data = JSON.parse(event.data);
 
-    if (data.device_status !== undefined) {
+    if (data.user == "{{ user.username }}" && data.device_status !== undefined) {
         data = data.device_status
         // Hiển thị trạng thái trên giao diện
         const deviceId = data.device_id;
