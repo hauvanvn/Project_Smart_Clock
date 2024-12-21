@@ -26,6 +26,15 @@ Những framework được sử dụng trong đồ án:
     - `sudo apt install redis`
     - `sudo service redis-server start`
     - Để kiểm tra redis-server có hoạt động hay không: `redis-cli ping`. Nếu trả về PONG thì redis đã hoạt động.
+7. Trong folder `Project_Smart_Clock` tạo một file đặt tên là `secret_file.txt`. Trong file ghi theo thứ tự:
+    - Dòng đầu: Mã deploy key của Django(hông cho đâu :)) )
+    - Dòng thứ 2: Mail để send token reset password.
+    - Dòng thứ 3: Mã bảo mật cấp 2 của mail.
+    - Dòng thứ 4: tên database trong mySQL.
+    - Dòng thứ 5: Địa chỉ ip của database(nếu local thì: localhost).
+    - Dòng thứ 6: Port của database(mặc định là: 3306).
+    - Dòng thứ 7: username của database.
+    - Dòng cuối: password của database.
 7. `daphne -p 8000 IOT_Management.asgi:application` để chạy server(both develop and product).
 8. Mở thêm một terminal và thực hiện bước 2, 4. Sau đó chạy lệnh `py manage.py run_mqtt` để chạy mqtt websocket để giao tiếp với thiết bị và server.
 
