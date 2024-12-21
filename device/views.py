@@ -33,6 +33,7 @@ def deviceDashboard(request, slug):
         event_list.append(dateTime.strftime("%m"))
         event_list.append(dateTime.strftime("%d"))
         event_list.append(dateTime.strftime("%H:%M"))
+        event_list.append(event.id)
 
     # Today events
     today_event = []

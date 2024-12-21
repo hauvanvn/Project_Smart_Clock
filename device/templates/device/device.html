@@ -713,7 +713,8 @@
                 Deadline_list[Deadline].push(eventList[i]);
                 Deadline_list[Deadline].push(eventList[i + 5]);
                 Deadline_list[Deadline].push(eventList[i + 1]);
-                i += 5;
+                Deadline_list[Deadline].push(eventList[i + 6]);
+                i += 6;
             }
             const Deadline_date_list = Object.keys(Deadline_list);
 
@@ -733,7 +734,8 @@
                             assign_list.push(Deadline_list[Deadline_date_list[i]][j]);
                             assign_list.push(Deadline_list[Deadline_date_list[i]][j + 1]);
                             assign_list.push(Deadline_list[Deadline_date_list[i]][j + 2]);
-                            j += 2;
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j + 3]);
+                            j += 3;
                         }
                     }
                 }
@@ -784,10 +786,10 @@
                                         </a>
                                         <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
                                             {% csrf_token %}
-                                            <button type="submit" value="event_id" name="delete_event" class="btn-close"></button>
+                                            <button type="submit" value="` + assign_list[i + 3] + `" name="delete_event" class="btn-close"></button>
                                         </form>
                                  </div>`;
-                        i += 2; 
+                        i += 3; 
                     }
                 }
 
@@ -817,7 +819,8 @@
                             assign_list.push(Deadline_list[Deadline_date_list[i]][j]);
                             assign_list.push(Deadline_list[Deadline_date_list[i]][j + 1]);
                             assign_list.push(Deadline_list[Deadline_date_list[i]][j + 2]);
-                            j += 2;
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j + 3]);
+                            j += 3;
                         }
                     }
                 }
@@ -868,10 +871,10 @@
                                         </a>
                                         <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
                                             {% csrf_token %}
-                                            <button type="submit" value="event_id" name="delete_event" class="btn-close"></button>
+                                            <button type="submit" value="` + assign_list[i + 3] + `" name="delete_event" class="btn-close"></button>
                                         </form>
                                     </div>`;
-                        i += 2;
+                        i += 3;
                     }
                 }
 
@@ -899,7 +902,8 @@
                             assign_list.push(Deadline_list[Deadline_date_list[i]][j]);
                             assign_list.push(Deadline_list[Deadline_date_list[i]][j + 1]);
                             assign_list.push(Deadline_list[Deadline_date_list[i]][j + 2]);
-                            j += 2;
+                            assign_list.push(Deadline_list[Deadline_date_list[i]][j + 3]);
+                            j += 3;
                         }
                     }
                 }
@@ -950,23 +954,15 @@
                                         </a>
                                         <form method="POST" class="ms-auto" style="padding: 7% 3% 0 0">
                                             {% csrf_token %}
-                                            <button type="submit" value="event_id" name="delete_event" class="btn-close"></button>
+                                            <button type="submit" value="` + assign_list[i + 3] + `" name="delete_event" class="btn-close"></button>
                                         </form>
                                     </div>`;
-                        i += 2;
+                        i += 3;
                     }
                 }
 
                 days += `   </div>
                         </div>`;
-
-                    {% comment %} days += `<div class="card date"> 
-                                <div class="card-body d-flex flex-column padding_zero">
-                                    <p class="mb-auto margin_zero dayContent">${nextDate.getDate()}</p>
-                                    <p class="dayContent">Design</p>
-                                    <p class="dayContent">Note Taking</p>
-                                </div>
-                             </div>`; {% endcomment %}
                 }
             }
         

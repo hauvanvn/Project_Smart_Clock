@@ -1,3 +1,7 @@
+# Create data of temperture and humidity manually for statistic testing in dashboard line chart
+# Remember to Change auto_now_add=True to false in timestamp of AggregateData models
+# After changing model remember to makemigrations and migrate
+
 import os
 import django
 from random import uniform
