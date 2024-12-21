@@ -60,6 +60,12 @@ def handle_device_dht22_message(user, device_id, temp, humi):
         }
     )
 
+def sendPong(device_id):
+    topic = f"{settings.MAIN_TOPIC}/{device_id}/inp"
+    data = "pong"
+    client = get_mqtt_client(device_id)
+    client.publish(topic, data)
+
 mqtt_clients = {}
 
 def on_connect(client, userdata, flags, rc):
@@ -72,24 +78,27 @@ def on_connect(client, userdata, flags, rc):
         print(f"Failed to connect, return code {rc}")
 
 def on_message(client, userdata, msg):
-    if msg.payload.decode('utf-8') != "ping":
-        topic = msg.topic
-        parts = topic.split("/")
-        if len(parts) != 3 or parts[0] != settings.MAIN_TOPIC:
-            print(f"Unexpected topic structure: {topic}")
-            return
-        device_id = parts[1]
-        if not Devices.objects.filter(id=device_id).exists():
-            print(f"Uknown Device id: {device_id}")
-            return
-        
-        userdata['last_message'] = {
+    
+    topic = msg.topic
+    parts = topic.split("/")
+    if len(parts) != 3 or parts[0] != settings.MAIN_TOPIC:
+        print(f"Unexpected topic structure: {topic}")
+        return
+    device_id = parts[1]
+    if not Devices.objects.filter(id=device_id).exists():
+        print(f"Uknown Device id: {device_id}")
+        return
+    
+    userdata['last_message'] = {
             "time": time.time()
         }
+    
+    if msg.payload.decode('utf-8') != "ping":
+        
         status = "Connected" if check_connection(device_id) else "Disconnected"
         device = Devices.objects.get(id=device_id)
         handle_device_status_message(device.owner.username, device_id, status)
-        print("received message")
+        # print("received message")
 
         payload = json.loads(msg.payload.decode('utf-8'))
         # print(payload)
@@ -111,6 +120,8 @@ def on_message(client, userdata, msg):
             device = Devices.objects.get(id=device_id)
             handle_device_dht22_message(device.owner.username, device.id, temp, humi)
             THdata.objects.create(device=device,temperature=temp,humidity=humi)
+    else:
+        sendPong(device_id)
 
 
     print(f"Received message on topic {msg.topic}: {msg.payload.decode('utf-8')}")
