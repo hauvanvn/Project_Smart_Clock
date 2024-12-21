@@ -210,15 +210,15 @@ def create_client():
 stop_thread_mqtt_event = threading.Event()
 def send_data():
     while not stop_thread_mqtt_event.is_set():
-        devices = [device for device in Devices.objects.all() if check_connection(device.id)]
-
+        # devices = [device for device in Devices.objects.all() if check_connection(device.id)]
+        devices = Devices.objects.all()
         for device in devices:
             current_time = datetime.now(ZoneInfo(device.timezone))
             timee = current_time.strftime("%H%M%S")
             date = current_time.strftime("%a, %b %d, %Y")
             arlamSig = False
-            event_1 = ""
-            event_2 = ""
+            event_1 = "Today Have a lot of work need to be done"
+            event_2 = "2 exams in 5 days. Review your homework"
 
             # Nearest 2 event
             events = DeviceEvent.objects.filter(device=device)
@@ -244,6 +244,8 @@ def send_data():
 
             # Send data to Client
             topic = f"{settings.MAIN_TOPIC}/{device.id}/inp"
+            if device.id == "CL11335577":
+                print(device.ledmode, ", ", timee)
             data = {
                 "time": timee, 
                 "date": date,
@@ -257,7 +259,7 @@ def send_data():
             client.publish(topic, json.dumps(data))
             # print(f"Sended to {topic}: {json.dumps(data)}")
 
-        time.sleep(0.5)
+        time.sleep(1)
 
 stop_thread_aggregation_event = threading.Event()
 def aggregationData():
