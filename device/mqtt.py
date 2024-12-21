@@ -72,42 +72,47 @@ def on_connect(client, userdata, flags, rc):
         print(f"Failed to connect, return code {rc}")
 
 def on_message(client, userdata, msg):
-    topic = msg.topic
-    parts = topic.split("/")
-    if len(parts) != 3 or parts[0] != settings.MAIN_TOPIC:
-        print(f"Unexpected topic structure: {topic}")
-        return
-    device_id = parts[1]
-    if not Devices.objects.filter(id=device_id).exists():
-        print(f"Uknown Device id: {device_id}")
-        return
-    
-    userdata['last_message'] = {
-        "time": time.time()
-    }
-    status = "Connected" if check_connection(device_id) else "Disconnected"
-    device = Devices.objects.get(id=device_id)
-    handle_device_status_message(device.owner.username, device_id, status)
-
-    payload = json.loads(msg.payload.decode('utf-8'))
-    if ("change_led_mode" in payload):
-        if device.ledmode == "MODE 1":
-            device.ledmode = "MODE 2"
-        elif device.ledmode == "MODE 2":
-            device.ledmode = "MODE 3"
-        else: 
-            device.ledmode = "MODE 1"
-
-        device.save()
-        handle_device_LedMode_message(device.owner.username, device.id, device.ledmode)
-    
-    if ("dht22" in payload):
-        temp = payload.get("temperature")
-        humi = payload.get("humidity")
-
+    if msg.payload.decode('utf-8') != "ping":
+        topic = msg.topic
+        parts = topic.split("/")
+        if len(parts) != 3 or parts[0] != settings.MAIN_TOPIC:
+            print(f"Unexpected topic structure: {topic}")
+            return
+        device_id = parts[1]
+        if not Devices.objects.filter(id=device_id).exists():
+            print(f"Uknown Device id: {device_id}")
+            return
+        
+        userdata['last_message'] = {
+            "time": time.time()
+        }
+        status = "Connected" if check_connection(device_id) else "Disconnected"
         device = Devices.objects.get(id=device_id)
-        handle_device_dht22_message(device.owner.username, device.id, temp, humi)
-        THdata.objects.create(device=device,temperature=temp,humidity=humi)
+        handle_device_status_message(device.owner.username, device_id, status)
+        print("received message")
+
+        payload = json.loads(msg.payload.decode('utf-8'))
+        print(payload)
+        if ("change_led_mode" in payload):
+            if device.ledmode == "MODE 1":
+                device.ledmode = "MODE 2"
+            elif device.ledmode == "MODE 2":
+                device.ledmode = "MODE 3"
+            else: 
+                device.ledmode = "MODE 1"
+
+            device.save()
+            handle_device_LedMode_message(device.owner.username, device.id, device.ledmode)
+        
+        if ("dht22" in payload):
+            temp = payload.get("temperature")
+            humi = payload.get("humidity")
+
+            print(temp, ", ", humi)
+
+            device = Devices.objects.get(id=device_id)
+            handle_device_dht22_message(device.owner.username, device.id, temp, humi)
+            THdata.objects.create(device=device,temperature=temp,humidity=humi)
 
 
     print(f"Received message on topic {msg.topic}: {msg.payload.decode('utf-8')}")
@@ -126,7 +131,7 @@ def check_connection(device_id):
         return False
     
     device = mqtt_clients[device_id]
-    timeout = 10
+    timeout = 30
     start_time = device._userdata.get('last_message', {}).get('time')
     #print(start_time, " ", time.time(), " ", time.time() - start_time)
     if (time.time() - start_time > timeout):
@@ -301,11 +306,11 @@ def initialize_mqtt_clients():
     print(f"Initialized MQTT clients for {len(devices)} devices.")
 
     thread_socket = threading.Thread(target=create_client)
-    # thread_mqtt = threading.Thread(target=send_data)
-    # thread_aggregation = threading.Thread(target=aggregationData)
+    thread_mqtt = threading.Thread(target=send_data)
+    thread_aggregation = threading.Thread(target=aggregationData)
     thread_socket.start()
-    # thread_mqtt.start()
-    # thread_aggregation.start()
+    thread_mqtt.start()
+    thread_aggregation.start()
 
     try:
         while True:
@@ -326,7 +331,7 @@ def initialize_mqtt_clients():
             counter += 1
         
         thread_socket.join()
-        # thread_mqtt.join()
-        # thread_aggregation.join()
+        thread_mqtt.join()
+        thread_aggregation.join()
         print(f"Stopped MQTT clients for {counter} devices.")
         

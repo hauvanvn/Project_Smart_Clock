@@ -80,15 +80,15 @@ def get_THdata_average(type, device_id, date):
         end_time = start_time + timedelta(hours=1) - timedelta(seconds=1)
 
         if AggregateData.objects.filter(device=device_id, 
-                                 timestamp__range=(start_time,end_time)).exists():
-            hourly_avg = AggregateData.objects.get(
+                                        timestamp__range=(start_time,end_time)).exists():
+            hourly_avg = AggregateData.objects.filter(
                 device=device_id, 
                 timestamp__range=(start_time,end_time)
+            ).aggregate(
+                avg_temp = Avg('temperature'),
+                avg_humi = Avg('humidity')
             )
-            return {
-                'avg_temp': hourly_avg.avg_temperature,
-                'avg_humi': hourly_avg.avg_humidity
-            }
+            return hourly_avg
         else:
             return {
                 'avg_temp': 0,
