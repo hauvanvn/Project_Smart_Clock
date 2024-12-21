@@ -90,7 +90,7 @@ def resetPass(request):
         username = request.session['username']
         password1 = request.POST.get('pass1')
         password2 = request.POST.get('pass2')
-        code = request.POST.get('opt')
+        code = request.POST.get('otp')
 
         user = User.objects.get(username=username)
         otp = OtpToken.objects.filter(user=user).last()
