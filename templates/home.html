@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="{% static 'js/device_status.js' %}" defer></script>
 
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
 
@@ -105,7 +104,7 @@
                                                     {% csrf_token %}
                                                     <div class="mb-4">
                                                         <label for="changeDeviceName" class="form-label mb-2" id="form_label">Device Name</label>
-                                                        <input type="text" name="new_name" id="changeDeviceName" class="form-control form-control-xl fs-6" required>
+                                                        <input type="text" name="new_name" id="changeDeviceName-{{ device.id }}" class="form-control form-control-xl fs-6" required>
                                                     </div>
                                                     
                                                     <button type="submit" name="change_name" value="{{ device.id }}" class="w-100 btn btn-dark btn-md mb-4">Change</button>
@@ -178,5 +177,38 @@
             </div>
         </div>
     </div>
+    <script>
+        // Kết nối WebSocket
+        const socket = new WebSocket('ws://127.0.0.1:8000/ws/mqtt/front-end');
+
+        // Khi kết nối thành công
+        socket.onopen = function () {
+            console.log("WebSocket connection established.");
+        };
+
+        // Khi nhận được tin nhắn từ server
+        socket.onmessage = function (event) {
+            let data = JSON.parse(event.data);
+
+            if (data.user == "{{ user.username }}" && data.device_status !== undefined) {
+                data = data.device_status
+                // Hiển thị trạng thái trên giao diện
+                const deviceId = data.device_id;
+                const status = data.status;
+
+                // Ví dụ: cập nhật trạng thái thiết bị trên HTML
+                const statusElement = document.getElementById(`status-${deviceId}`);
+                if (statusElement) {
+                    statusElement.textContent = status;
+                }
+            }
+        };
+
+        // Khi WebSocket đóng
+        socket.onclose = function () {
+            console.log("WebSocket connection closed.");
+        };
+
+    </script>
 </body>
 </html>

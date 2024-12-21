@@ -92,7 +92,7 @@ def on_message(client, userdata, msg):
         print("received message")
 
         payload = json.loads(msg.payload.decode('utf-8'))
-        print(payload)
+        # print(payload)
         if ("change_led_mode" in payload):
             if device.ledmode == "MODE 1":
                 device.ledmode = "MODE 2"
@@ -107,8 +107,6 @@ def on_message(client, userdata, msg):
         if ("dht22" in payload):
             temp = payload.get("temperature")
             humi = payload.get("humidity")
-
-            print(temp, ", ", humi)
 
             device = Devices.objects.get(id=device_id)
             handle_device_dht22_message(device.owner.username, device.id, temp, humi)
@@ -133,7 +131,7 @@ def check_connection(device_id):
     device = mqtt_clients[device_id]
     timeout = 30
     start_time = device._userdata.get('last_message', {}).get('time')
-    #print(start_time, " ", time.time(), " ", time.time() - start_time)
+    # print(device_id, ":   ", start_time, " ", time.time(), " ", time.time() - start_time)
     if (time.time() - start_time > timeout):
         return False
     return True
@@ -215,15 +213,15 @@ def create_client():
 stop_thread_mqtt_event = threading.Event()
 def send_data():
     while not stop_thread_mqtt_event.is_set():
-        # devices = [device for device in Devices.objects.all() if check_connection(device.id)]
-        devices = Devices.objects.all()
+        devices = [device for device in Devices.objects.all() if check_connection(device.id)]
+        # devices = Devices.objects.all()
         for device in devices:
             current_time = datetime.now(ZoneInfo(device.timezone))
             timee = current_time.strftime("%H%M%S")
             date = current_time.strftime("%a, %b %d, %Y")
             arlamSig = False
-            event_1 = "Today Have a lot of work need to be done"
-            event_2 = "2 exams in 5 days. Review your homework"
+            event_1 = "No Event today!"
+            event_2 = ""
 
             # Nearest 2 event
             events = DeviceEvent.objects.filter(device=device)
@@ -249,8 +247,6 @@ def send_data():
 
             # Send data to Client
             topic = f"{settings.MAIN_TOPIC}/{device.id}/inp"
-            if device.id == "CL11335577":
-                print(device.ledmode, ", ", timee)
             data = {
                 "time": timee, 
                 "date": date,

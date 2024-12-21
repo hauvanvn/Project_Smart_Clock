@@ -43,6 +43,7 @@ def homePage(request):
             client = get_mqtt_client(id)
             last_message = client._userdata.get("last_message")
             if "topic" in last_message:
+                client.publish(TOPIC_OUT, "pong")
                 stop_mqt_client(id)
                 newDevice = DevicesForm({'id': id, 'name': name, 'type': type, 'owner': user})
                 if newDevice.is_valid():

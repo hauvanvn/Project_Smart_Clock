@@ -9,14 +9,13 @@ from datetime import datetime, timedelta
 from device.mqtt import stop_mqt_client
 from channels.db import database_sync_to_async
 
-def send_newDevice(user, device_id, topic):
+def send_newDevice(device_id, topic):
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         "mqtt_back_end",
         {
             "type": "send_event",
             "message": {
-                "user": user,
                 "command": "add_device",
                 "device_id": device_id,
                 "topic": topic,
@@ -37,21 +36,6 @@ def delete_mqtt_client(sender, instance, **kwargs):
             },
         }
     )
-
-# def send_deviceData(user, timezone, ledmode):
-#     channel_layer = get_channel_layer()
-#     async_to_sync(channel_layer.group_send)(
-#         "mqtt_front_end",
-#         {
-#             "type": "send_event",
-#             "message": {
-#                 "user": user,
-#                 "command": "device_data",
-#                 "timezone": timezone,
-#                 "ledmode": ledmode,
-#             },
-#         }
-#     )
 
 def send_changeChart(user, device_id, temp, humi):
     channel_layer = get_channel_layer()
@@ -85,8 +69,8 @@ def get_THdata_average(type, device_id, date):
                 device=device_id, 
                 timestamp__range=(start_time,end_time)
             ).aggregate(
-                avg_temp = Avg('temperature'),
-                avg_humi = Avg('humidity')
+                avg_temp = Avg('avg_temperature'),
+                avg_humi = Avg('avg_humidity')
             )
             return hourly_avg
         else:
