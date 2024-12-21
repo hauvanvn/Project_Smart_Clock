@@ -28,14 +28,14 @@ secret_file.close()
 SECRET_KEY = secret_info[0]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = secret_info[1] #Email to send messesges
 EMAIL_HOST_PASSWORD = secret_info[2] #Password to allow django accessing the email
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

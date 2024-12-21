@@ -14,9 +14,9 @@ django.setup()
 from device.models import AggregateData, Devices  # Replace 'myapp' with your app name
 
 # Fetch or create a test device  
-test_device = Devices.objects.get(id="CL0001")
+test_device = Devices.objects.get(id="CL22127105")
 
-rootTime = datetime(year=2024, month=12, day=20)
+rootTime = datetime(year=2024, month=12, day=22)
 
 print(rootTime)
 print("ROOT TIME ABOVE")
